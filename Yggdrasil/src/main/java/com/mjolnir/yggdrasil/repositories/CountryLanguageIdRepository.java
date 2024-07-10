@@ -1,8 +1,12 @@
-package com.mjolnir.yggdrasil.repositories;
+//package com.mjolnir.yggdrasil.repositories;
+//
+//import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
+//import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//
 
-import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
-import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CountryLanguageIdRepository extends JpaRepository<CountryLanguageIdEntity, String> {
-}
+//@Repository
+//public interface CountryLanguageIdRepository extends JpaRepository<CountryLanguageIdEntity, CountryLanguageIdEntity> {
+//}
