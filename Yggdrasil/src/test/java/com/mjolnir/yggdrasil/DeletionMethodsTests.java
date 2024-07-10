@@ -1,7 +1,6 @@
 package com.mjolnir.yggdrasil;
 
 import com.mjolnir.yggdrasil.entities.CityEntity;
-import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @Transactional
 @SpringBootTest
-public class DeletionTests {
+public class DeletionMethodsTests {
 
     @Autowired
     private WorldService worldService;
@@ -79,6 +78,5 @@ public class DeletionTests {
         boolean isDeletionSuccessful = worldService.deleteCityById(119);
         Assertions.assertTrue(isDeletionSuccessful);
     }
-
 
 }
