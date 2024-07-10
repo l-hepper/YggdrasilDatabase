@@ -1,4 +1,7 @@
 package com.mjolnir.yggdrasil.repositories;
 
-public class CountryLanguageRepository {
+import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CountryLanguageRepository extends JpaRepository<CountryLanguageEntity, String> {
 }
