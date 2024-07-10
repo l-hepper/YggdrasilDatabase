@@ -1,11 +1,14 @@
 package com.mjolnir.yggdrasil.service;
 
+import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 //import com.mjolnir.yggdrasil.repositories.CountryLanguageIdRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class WorldService {
@@ -22,7 +25,16 @@ public class WorldService {
         this.countryRepository = countryRepository;
     }
 
-    public void deleteCountryByCode(String countryCode) {
-        countryRepository.deleteById(countryCode);
+    public boolean deleteCountryByCode(String countryCode) {
+        Optional< CountryEntity> country = countryRepository.findById(countryCode);
+
+        if (country.isPresent()) {
+            countryRepository.delete(country.get());
+            return true;
+        } else {
+            return false;
+        }
     }
+
+
 }
