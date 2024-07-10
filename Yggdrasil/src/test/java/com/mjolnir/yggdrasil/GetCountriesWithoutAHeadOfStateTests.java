@@ -38,6 +38,15 @@ public class GetCountriesWithoutAHeadOfStateTests {
         Assertions.assertFalse(flag);
     }
 
-//    @Test
-//    void testGetCountriesWithoutAHeadOfStateContains() {}
+    @Test
+    void testGetCountriesWithoutAHeadOfStateReturnsNoCountriesIfNoneArePresent() {
+        List<CountryEntity> countriesWithoutAHeadOfState = worldService.getAllCountriesWithoutAHeadOfState();
+
+        for (CountryEntity country : countriesWithoutAHeadOfState) {
+            worldService.deleteCountryByCode(country.getCode());
+        }
+
+        List<CountryEntity> emptyList = worldService.getAllCountriesWithoutAHeadOfState();
+        Assertions.assertTrue(emptyList.isEmpty());
+    }
 }
