@@ -83,10 +83,10 @@ public class CountryEntity {
     @Column(name = "Code2", nullable = false, length = 2)
     private String code2;
 
-    @OneToMany(mappedBy = "countryEntityCode")
+    @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL)
     private Set<CityEntity> cities = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "countryEntityCode")
+    @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL)
     private Set<CountryLanguageEntity> countryLanguageEntities = new LinkedHashSet<>();
 
     public String getCode() {
