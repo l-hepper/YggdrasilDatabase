@@ -1,5 +1,6 @@
 package com.mjolnir.yggdrasil.service;
 
+import com.mjolnir.yggdrasil.entities.CityEntity;
 import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 //import com.mjolnir.yggdrasil.repositories.CountryLanguageIdRepository;
@@ -26,10 +27,21 @@ public class WorldService {
     }
 
     public boolean deleteCountryByCode(String countryCode) {
-        Optional< CountryEntity> country = countryRepository.findById(countryCode);
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
 
         if (country.isPresent()) {
             countryRepository.delete(country.get());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean deleteCityById(int cityID) {
+        Optional<CityEntity> city = cityRepository.findById(cityID);
+
+        if (city.isPresent()) {
+            cityRepository.delete(city.get());
             return true;
         } else {
             return false;
