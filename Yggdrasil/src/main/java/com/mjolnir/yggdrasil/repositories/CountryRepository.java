@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CountryRepository extends JpaRepository<CountryEntity, String> {
+    boolean existsByCode2(String code2);
 }
