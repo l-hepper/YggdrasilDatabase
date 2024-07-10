@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,5 +84,18 @@ public class WorldService {
         } else {
             return false;
         }
+    }
+
+    public List<CountryEntity> getAllCountriesWithoutAHeadOfState() {
+        List<CountryEntity> countriesWithoutAHeadOfState = new ArrayList<>();
+
+        List<CountryEntity> countries = countryRepository.findAll();
+        for (CountryEntity country : countries) {
+            if (country.getHeadOfState() == null || country.getHeadOfState().isBlank()) {
+                countriesWithoutAHeadOfState.add(country);
+            }
+        }
+
+        return countriesWithoutAHeadOfState;
     }
 }
