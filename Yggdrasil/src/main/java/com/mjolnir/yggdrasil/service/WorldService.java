@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.data.util.Pair;
+import org.springframework.data.util.Pair.Of;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -441,6 +441,7 @@ public class WorldService {
             }
         }
         return largestCity;
+    }
 
     public List<Pair<String, Integer>> findFiveSmallestDistricts() {
         Map<String, Integer> districts = getDistrictPopulationMap();
