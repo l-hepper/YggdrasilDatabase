@@ -234,8 +234,10 @@ public class WorldService {
 
         if (country.isPresent()) {
             countryRepository.delete(country.get());
+            logger.info("Country with code " + countryCode + ": " + country.get().getName() + " is successfully deleted.");
             return true;
         } else {
+            logger.info("Country with code " + countryCode + " does not exist.");
             return false;
         }
     }
@@ -245,8 +247,10 @@ public class WorldService {
 
         if (city.isPresent()) {
             cityRepository.delete(city.get());
+            logger.info("City with ID " + cityID + " is successfully deleted.");
             return true;
         } else {
+            logger.info("City with ID " + cityID + " does not exist.");
             return false;
         }
     }
@@ -259,8 +263,10 @@ public class WorldService {
         Optional<CountryLanguageEntity> countryLanguage = countryLanguageRepository.findById(primaryKey);
         if (countryLanguage.isPresent()) {
             countryLanguageRepository.delete(countryLanguage.get());
+            logger.info("CountryLanguage with CountryCode: " + countryCode + " and Language: " + language + " is successfully deleted.");
             return true;
         } else {
+            logger.info("CountryLanguage with CountryCode: " + countryCode + " or Language: " + language + " does not exist.");
             return false;
         }
     }
@@ -276,8 +282,10 @@ public class WorldService {
 
         List<CountryLanguageEntity> newCountryLanguages = countryLanguageRepository.findAll();
         if (newCountryLanguages.size() < countryLanguages.size()) {
+            logger.info("All instances of Language:" + languageToDelete + " have been deleted.");
             return true;
         } else {
+            logger.info("No instances of Language:" + languageToDelete + " found.");
             return false;
         }
     }
@@ -292,6 +300,7 @@ public class WorldService {
             }
         }
 
+        logger.info("Returning list of size:" + countriesWithoutAHeadOfState.size() + " without a head of state.");
         return countriesWithoutAHeadOfState;
     }
 
@@ -308,6 +317,10 @@ public class WorldService {
         Optional<CountryLanguageEntity> mostSpoken = getMostSpokenLanguage(officialLanguages);
         if (mostSpoken.isPresent()) {
             int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
+            logger.info("Most popular official language in " + country.get().getName() +
+                    " is " + mostSpoken.get().getLanguage() +
+                    " with " +numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
+                    " speakers.");
             return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
         } else {
             return 0;
