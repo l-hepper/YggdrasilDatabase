@@ -61,4 +61,15 @@ public class CountryLanguageEntity {
         this.percentage = percentage;
     }
 
+    public void setLanguage(String language) {
+        if (this.id == null) {
+            this.id = new CountryLanguageIdEntity();
+            this.id.setCountryCode(countryEntityCode.getCode());
+        }
+        this.id.setLanguage(language);
+    }
+
+    public String getLanguage() {
+        return this.id.getLanguage();
+    }
 }

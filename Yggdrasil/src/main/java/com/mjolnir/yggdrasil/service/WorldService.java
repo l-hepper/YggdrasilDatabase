@@ -28,6 +28,7 @@ public class WorldService {
     public WorldService(CityRepository cityRepository, CountryLanguageRepository countryLanguageRepository, CountryRepository countryRepository, DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration) {
         this.cityRepository = cityRepository;
 //        this.countryLanguageIdRepository = countryLanguageIdRepository;
+
         this.countryLanguageRepository = countryLanguageRepository;
         this.countryRepository = countryRepository;
         this.dataSourceTransactionManagerAutoConfiguration = dataSourceTransactionManagerAutoConfiguration;
@@ -98,4 +99,65 @@ public class WorldService {
 
         return countriesWithoutAHeadOfState;
     }
+
+    // Update
+    public boolean updateCityById(Integer id, CityEntity city){
+        if (id == null || city == null) {
+            return false;
+        }
+
+        Optional<CityEntity> toUpdate = cityRepository.findById(id);
+        if (toUpdate.isPresent()) {
+            CityEntity existingCity = toUpdate.get();
+            existingCity.setName(city.getName());
+            existingCity.setDistrict(city.getDistrict());
+            existingCity.setPopulation(city.getPopulation());
+            cityRepository.save(existingCity);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateCountryById(String id, CountryEntity country){
+        if (id == null || country == null) {
+            return false;
+        }
+
+        Optional<CountryEntity> toUpdate = countryRepository.findById(id);
+        if (toUpdate.isPresent()) {
+            CountryEntity existingCountry = toUpdate.get();
+            existingCountry.setName(country.getName());
+            existingCountry.setPopulation(country.getPopulation());
+            existingCountry.setSurfaceArea(country.getSurfaceArea());
+            existingCountry.setIndepYear(country.getIndepYear());
+            existingCountry.setLifeExpectancy(country.getLifeExpectancy());
+            existingCountry.setGnp(country.getGnp());
+            existingCountry.setGNPOld(country.getGNPOld());
+            existingCountry.setLocalName(country.getLocalName());
+            existingCountry.setGovernmentForm(country.getGovernmentForm());
+            existingCountry.setHeadOfState(country.getHeadOfState());
+            existingCountry.setCapital(country.getCapital());
+            existingCountry.setCode2(country.getCode2());
+            countryRepository.save(existingCountry);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateLanguageById(CountryLanguageIdEntity id, CountryLanguageEntity lang){
+        if (id == null || lang == null) {
+            return false;
+        }
+
+        Optional<CountryLanguageEntity> toUpdate = countryLanguageRepository.findById(id);
+        if (toUpdate.isPresent()) {
+            CountryLanguageEntity existingLanguage = toUpdate.get();
+            existingLanguage.setIsOfficial(lang.getIsOfficial());
+            existingLanguage.setPercentage(lang.getPercentage());
+            countryLanguageRepository.save(existingLanguage);
+            return true;
+        }
+        return false;
+    }
+
 }
