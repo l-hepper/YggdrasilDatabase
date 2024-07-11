@@ -7,19 +7,19 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import static com.mjolnir.yggdrasil.utilities.Regex.CONTINENT_REGEX;
 import static com.mjolnir.yggdrasil.utilities.Regex.REGION_REGEX;
 
@@ -42,10 +42,7 @@ public class WorldService {
 
     public void createNewCity(String countryCode, String cityName, String cityDistrict, Integer population, boolean isCapital) {
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
-        if (countryEntityOptional.isPresent()
-                && cityName != null
-                && cityDistrict != null
-                && population > 0) {
+        if (countryEntityOptional.isPresent() && cityName != null && cityDistrict != null && population > 0) {
 
             CountryEntity countryEntity = countryEntityOptional.get();
 
@@ -61,7 +58,6 @@ public class WorldService {
                 countryEntity.setCapital(cityEntity.getId());
                 countryRepository.save(countryEntity);
                 logger.info("Capital city " + cityName + " added successfully for country " + countryEntity.getName() + ".");
-
 
 
             } else {
@@ -88,21 +84,7 @@ public class WorldService {
         boolean countryCodeExists = countryRepository.existsById(countryCode);
         boolean countryCode2Exists = countryRepository.existsByCode2(countryCode2);
 
-        if (!countryCodeExists && !countryCode2Exists
-                && (countryName != null && countryName.length() < 52)
-                && continent.matches(CONTINENT_REGEX)
-                && (region.matches(REGION_REGEX) && region.length() < 26)
-                && surfaceArea.compareTo(BigDecimal.ZERO) > 0
-                && (independenceYear == null || independenceYear > 0)
-                && (population == null || population > 0)
-                && (lifeExpectancy == null || lifeExpectancy.compareTo(BigDecimal.ZERO) > 0)
-                && (GNP == null || GNP.compareTo(BigDecimal.ZERO) > 0)
-                && (GNPOld == null || GNPOld.compareTo(BigDecimal.ZERO) > 0)
-                && (localName != null && localName.length() < 45)
-                && governmentForm != null
-                && (headOfState == null || !headOfState.isEmpty())
-                && (countryCode2 != null && countryCode2.length() == 2)
-                && (countryCode.length() == 3)) {
+        if (!countryCodeExists && !countryCode2Exists && (countryName != null && countryName.length() < 52) && continent.matches(CONTINENT_REGEX) && (region.matches(REGION_REGEX) && region.length() < 26) && surfaceArea.compareTo(BigDecimal.ZERO) > 0 && (independenceYear == null || independenceYear > 0) && (population == null || population > 0) && (lifeExpectancy == null || lifeExpectancy.compareTo(BigDecimal.ZERO) > 0) && (GNP == null || GNP.compareTo(BigDecimal.ZERO) > 0) && (GNPOld == null || GNPOld.compareTo(BigDecimal.ZERO) > 0) && (localName != null && localName.length() < 45) && governmentForm != null && (headOfState == null || !headOfState.isEmpty()) && (countryCode2 != null && countryCode2.length() == 2) && (countryCode.length() == 3)) {
 
             CountryEntity newCountry = new CountryEntity();
             newCountry.setCode(countryCode);
@@ -187,11 +169,7 @@ public class WorldService {
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
 
         //checks if country exists, and correct parameters
-        if (countryEntityOptional.isPresent()
-                && language != null
-                && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T"))
-                && percentageSpoken.compareTo(BigDecimal.ZERO) > 0
-                && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
+        if (countryEntityOptional.isPresent() && language != null && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T")) && percentageSpoken.compareTo(BigDecimal.ZERO) > 0 && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
 
             //Get countryEntity as an object (the whole row)
             CountryEntity countryEntity = countryEntityOptional.get();
@@ -337,10 +315,10 @@ public class WorldService {
         }
         return Optional.of(mostSpokenLanguage);
     }
-  
+
     // Update
-    public boolean updateCityById(Integer id, CityEntity city){
-        if (id == null || city == null) {
+    public boolean updateCityById(Integer id, CityEntity city) {
+        if (id == null || city == null || city.getPopulation() < 0) {
             return false;
         }
 
@@ -356,34 +334,39 @@ public class WorldService {
         return false;
     }
 
-    public boolean updateCountryById(String id, CountryEntity country){
-        if (id == null || country == null) {
+    public boolean updateCountryById(String id, CountryEntity country) {
+        if (id == null || country == null || country.getPopulation() < 0 || country.getLifeExpectancy().compareTo(BigDecimal.ZERO) < 0 || country.getGnp().compareTo(BigDecimal.ZERO) < 0 || (country.getGNPOld() != null && country.getGNPOld().compareTo(BigDecimal.ZERO) < 0) || country.getGovernmentForm() == null) {
             return false;
         }
 
         Optional<CountryEntity> toUpdate = countryRepository.findById(id);
         if (toUpdate.isPresent()) {
-            CountryEntity existingCountry = toUpdate.get();
-            existingCountry.setName(country.getName());
-            existingCountry.setPopulation(country.getPopulation());
-            existingCountry.setSurfaceArea(country.getSurfaceArea());
-            existingCountry.setIndepYear(country.getIndepYear());
-            existingCountry.setLifeExpectancy(country.getLifeExpectancy());
-            existingCountry.setGnp(country.getGnp());
-            existingCountry.setGNPOld(country.getGNPOld());
-            existingCountry.setLocalName(country.getLocalName());
-            existingCountry.setGovernmentForm(country.getGovernmentForm());
-            existingCountry.setHeadOfState(country.getHeadOfState());
-            existingCountry.setCapital(country.getCapital());
-            existingCountry.setCode2(country.getCode2());
+            CountryEntity existingCountry = getCountryEntity(country, toUpdate);
             countryRepository.save(existingCountry);
             return true;
         }
         return false;
     }
 
-    public boolean updateLanguageById(CountryLanguageIdEntity id, CountryLanguageEntity lang){
-        if (id == null || lang == null) {
+    private static CountryEntity getCountryEntity(CountryEntity country, Optional<CountryEntity> toUpdate) {
+        CountryEntity existingCountry = toUpdate.get();
+        existingCountry.setName(country.getName());
+        existingCountry.setPopulation(country.getPopulation());
+        existingCountry.setSurfaceArea(country.getSurfaceArea());
+        existingCountry.setIndepYear(country.getIndepYear());
+        existingCountry.setLifeExpectancy(country.getLifeExpectancy());
+        existingCountry.setGnp(country.getGnp());
+        existingCountry.setGNPOld(country.getGNPOld());
+        existingCountry.setLocalName(country.getLocalName());
+        existingCountry.setGovernmentForm(country.getGovernmentForm());
+        existingCountry.setHeadOfState(country.getHeadOfState());
+        existingCountry.setCapital(country.getCapital());
+        existingCountry.setCode2(country.getCode2());
+        return existingCountry;
+    }
+
+    public boolean updateLanguageById(CountryLanguageIdEntity id, CountryLanguageEntity lang) {
+        if (id == null || lang == null || lang.getPercentage().compareTo(BigDecimal.ZERO) < 0 || lang.getPercentage().compareTo(BigDecimal.valueOf(100)) > 0) {
             return false;
         }
 
@@ -396,5 +379,34 @@ public class WorldService {
             return true;
         }
         return false;
+    }
+
+    public List<Pair<String, Integer>> findFiveSmallestDistricts() {
+        Map<String, Integer> districts = getDistrictPopulationMap();
+
+        return districts.entrySet().stream()
+               .sorted(Map.Entry.comparingByValue())
+               .limit(5)
+               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+               .collect(Collectors.toList());
+    }
+
+    public List<Pair<String, Integer>> findFiveLargestDistricts() {
+        Map<String, Integer> districts = getDistrictPopulationMap();
+
+        return districts.entrySet().stream()
+               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+               .limit(5)
+               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+               .collect(Collectors.toList());
+    }
+
+    private Map<String, Integer> getDistrictPopulationMap() {
+        Map<String, Integer> districts = new HashMap<>();
+
+        cityRepository.findAll().stream().
+                filter(city -> city.getDistrict() != null).
+                forEach(city -> districts.put(city.getDistrict(), districts.getOrDefault(city.getDistrict(), 0) + city.getPopulation()));
+        return districts;
     }
 }
