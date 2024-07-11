@@ -162,25 +162,19 @@ public class WorldService {
     }
 
     public void createNewCountryLanguage(String countryCode, String language, String isOfficial, BigDecimal percentageSpoken) {
-        // Finds country on the country table by getting it via the countryCode parameter.
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
 
-        //checks if country exists, and correct parameters
         if (countryEntityOptional.isPresent() && language != null && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T")) && percentageSpoken.compareTo(BigDecimal.ZERO) > 0 && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
 
-            //Get countryEntity as an object (the whole row)
             CountryEntity countryEntity = countryEntityOptional.get();
 
-            //Make new row in country language and country languageid tables
             CountryLanguageIdEntity countryLanguageIdEntity = new CountryLanguageIdEntity();
             CountryLanguageEntity countryLanguageEntity = new CountryLanguageEntity();
-
 
             countryLanguageEntity.setCountryCode(countryEntity);
             countryLanguageEntity.setLanguage(language);
             countryLanguageEntity.setIsOfficial(isOfficial);
             countryLanguageEntity.setPercentage(percentageSpoken);
-
 
             countryLanguageRepository.save(countryLanguageEntity);
             logger.info("Language '" + language + "' with country code " + countryCode + " added successfully.");
