@@ -145,7 +145,7 @@ class ReadCitiesMethodTests {
     @Test
     @DisplayName("Population below zero throws exception for getCitiesByMaxPopulation")
     void populationBelowZeroThrowsExceptionForGetCitiesByMaxPopulation() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> worldService.getCitiesByMinPopulation(-1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> worldService.getCitiesByMaxPopulation(-1));
     }
     
     
