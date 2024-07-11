@@ -7,7 +7,7 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
-import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import static com.mjolnir.yggdrasil.utilities.Regex.CONTINENT_REGEX;
 import static com.mjolnir.yggdrasil.utilities.Regex.REGION_REGEX;
 
@@ -425,8 +427,101 @@ public class WorldService {
                 countryWithMostCities = entry.getKey();
             }
         }
-        return new Pair<>(countryWithMostCities, mostCities);
+        return Pair.of(countryWithMostCities, mostCities);
     }
+
+    public CityEntity getCityById(Integer id) {
+        Optional<CityEntity> cityOptional = cityRepository.findById(id);
+        if (cityOptional.isPresent()) {
+            return cityOptional.get();
+        } else {
+            throw new IllegalArgumentException("City with ID " + id + " not found");
+        }
+    }
+
+    public List<CityEntity> getAllCities() {
+        return cityRepository.findAll();
+    }
+
+    public List<CityEntity> getCitiesByCountryCode(String countryCode) {
+        List<CityEntity> cities = cityRepository.findAll().stream().
+                filter(city -> city.getCountryCode().getCode().equals(countryCode))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("Cities with country code " + countryCode + " not found");
+        } else {
+            return cities;
+        }
+
+    }
+
+    public List<CityEntity> getCitiesByName(String name) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (name.isEmpty()) {
+            return List.of();
+        }
+        return cities.stream()
+                .filter(city -> city.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+    }
+
+    public List<CityEntity> getCitiesByDistrict(String district) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (district.isEmpty()) {
+            return List.of();
+        }
+        cities = cities.stream()
+                .filter(city -> city.getDistrict().toLowerCase().contains(district.toLowerCase()))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("No cities found for district " + district);
+        } else {
+            return cities;
+        }
+    }
+
+    public List<CityEntity> getCitiesByMinPopulation(int minPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (minPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() >= minPopulation)
+                    .collect(Collectors.toList());
+
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + minPopulation);
+        }
+    }
+
+    public List<CityEntity> getCitiesByMaxPopulation(int maxPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (maxPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() <= maxPopulation)
+                    .collect(Collectors.toList());
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + maxPopulation);
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
