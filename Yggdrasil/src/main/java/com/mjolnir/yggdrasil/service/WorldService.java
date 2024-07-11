@@ -502,4 +502,9 @@ public class WorldService {
         }
         return Pair.of(countryWithMostCities, mostCities);
     }
+
+    public List<CountryLanguageEntity> getLanguagesByCountryCode(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+        return country.map(countryEntity -> countryEntity.getCountrylanguages().stream().toList()).orElse(Collections.emptyList());
+    }
 }
