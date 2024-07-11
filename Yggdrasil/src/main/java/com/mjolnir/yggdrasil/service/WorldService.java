@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import static com.mjolnir.yggdrasil.utilities.Regex.CONTINENT_REGEX;
 import static com.mjolnir.yggdrasil.utilities.Regex.REGION_REGEX;
 
@@ -61,7 +62,6 @@ public class WorldService {
                 countryEntity.setCapital(cityEntity.getId());
                 countryRepository.save(countryEntity);
                 logger.info("Capital city " + cityName + " added successfully for country " + countryEntity.getName() + ".");
-
 
 
             } else {
@@ -319,7 +319,7 @@ public class WorldService {
             int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
             logger.info("Most popular official language in " + country.get().getName() +
                     " is " + mostSpoken.get().getLanguage() +
-                    " with " +numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
+                    " with " + numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
                     " speakers.");
             return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
         } else {
@@ -350,9 +350,9 @@ public class WorldService {
         }
         return Optional.of(mostSpokenLanguage);
     }
-  
+
     // Update
-    public boolean updateCityById(Integer id, CityEntity city){
+    public boolean updateCityById(Integer id, CityEntity city) {
         if (id == null || city == null) {
             return false;
         }
@@ -369,7 +369,7 @@ public class WorldService {
         return false;
     }
 
-    public boolean updateCountryById(String id, CountryEntity country){
+    public boolean updateCountryById(String id, CountryEntity country) {
         if (id == null || country == null) {
             return false;
         }
@@ -395,7 +395,7 @@ public class WorldService {
         return false;
     }
 
-    public boolean updateLanguageById(CountryLanguageIdEntity id, CountryLanguageEntity lang){
+    public boolean updateLanguageById(CountryLanguageIdEntity id, CountryLanguageEntity lang) {
         if (id == null || lang == null) {
             return false;
         }
@@ -409,5 +409,49 @@ public class WorldService {
             return true;
         }
         return false;
+    }
+
+    public double whatPercentageOfPopulationLivesInLargestCityIn(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+
+        if (!country.isPresent()) {
+            logger.info("Country with CountryCode:" + countryCode + " not found.");
+            return 0;
+        }
+
+        List<CityEntity> allCitiesInCountry = getAllCitiesInCountry(countryCode);
+        CityEntity largestCity = getLargestCity(allCitiesInCountry);
+
+        double countryPopulation = country.get().getPopulation();
+        double largestCityPopulation = largestCity.getPopulation();
+        double percentageOfPopulationInLargestCity = (largestCityPopulation) / countryPopulation * 100;
+        logger.info("The largest city in " + country.get().getName() +
+                " is " + largestCity.getName() +
+                " and " + percentageOfPopulationInLargestCity +
+                "% of the total population lives there.");
+        return percentageOfPopulationInLargestCity;
+    }
+
+    private List<CityEntity> getAllCitiesInCountry(String countryCode) {
+        CountryEntity country = countryRepository.findById(countryCode).get();
+        List<CityEntity> allCities = cityRepository.findAll();
+        List<CityEntity> citiesInCountry = new ArrayList<>();
+        for (CityEntity city : allCities) {
+            if (city.getCountryCode().equals(countryCode)) {
+                citiesInCountry.add(city);
+            }
+        }
+
+        return citiesInCountry;
+    }
+
+    private CityEntity getLargestCity(List<CityEntity> cities) {
+        CityEntity largestCity = cities.get(0);
+        for (CityEntity city : cities) {
+            if (city.getPopulation() > largestCity.getPopulation()) {
+                largestCity = city;
+            }
+        }
+        return largestCity;
     }
 }
