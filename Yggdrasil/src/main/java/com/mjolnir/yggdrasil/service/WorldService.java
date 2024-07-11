@@ -395,8 +395,6 @@ public class WorldService {
     }
 
     public Pair<String, Integer> getCountryWithMostCities() {
-
-
         Set<CityEntity> citiesSet = new HashSet<>(cityRepository.findAll());
         Map<String, Integer> countryCityCountMap = new HashMap<>();
 
@@ -406,15 +404,15 @@ public class WorldService {
         }
 
         String countryWithMostCities = null;
-        int maxCities = 0;
+        int mostCities = 0;
 
         for (Map.Entry<String, Integer> entry : countryCityCountMap.entrySet()) {
-            if (entry.getValue() > maxCities) {
-                maxCities = entry.getValue();
+            if (entry.getValue() > mostCities) {
+                mostCities = entry.getValue();
                 countryWithMostCities = entry.getKey();
             }
         }
-        return new Pair<>(countryWithMostCities, maxCities);
+        return new Pair<>(countryWithMostCities, mostCities);
     }
 
 
