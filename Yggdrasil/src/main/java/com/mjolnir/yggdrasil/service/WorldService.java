@@ -424,10 +424,11 @@ public class WorldService {
 
         double countryPopulation = country.get().getPopulation();
         double largestCityPopulation = largestCity.getPopulation();
-        double percentageOfPopulationInLargestCity = (largestCityPopulation) / countryPopulation * 100;
+        double percentageOfPopulationInLargestCity = (largestCityPopulation / countryPopulation) * 100;
+        String formattedPercentage = String.format("%.2f", percentageOfPopulationInLargestCity);
         logger.info("The largest city in " + country.get().getName() +
                 " is " + largestCity.getName() +
-                " and " + percentageOfPopulationInLargestCity +
+                " and " + formattedPercentage +
                 "% of the total population lives there.");
         return percentageOfPopulationInLargestCity;
     }
@@ -437,11 +438,10 @@ public class WorldService {
         List<CityEntity> allCities = cityRepository.findAll();
         List<CityEntity> citiesInCountry = new ArrayList<>();
         for (CityEntity city : allCities) {
-            if (city.getCountryCode().equals(countryCode)) {
+            if (city.getCountryCode().getCode().equals(countryCode)) {
                 citiesInCountry.add(city);
             }
         }
-
         return citiesInCountry;
     }
 
