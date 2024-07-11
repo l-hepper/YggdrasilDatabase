@@ -108,42 +108,38 @@ public class WorldService {
         }
 
         int population = country.get().getPopulation();
-        BigDecimal percentageWhoSpeaksMostPopularOfficialLanguage;
-        Optional<CountryLanguageEntity> mostPopularOfficialLanguage = getMostPopularOfficialLanguageInCountry(countryCode);
-        if (mostPopularOfficialLanguage.isPresent()) {
-            percentageWhoSpeaksMostPopularOfficialLanguage = mostPopularOfficialLanguage.get().getPercentage();
-            int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * percentageWhoSpeaksMostPopularOfficialLanguage.doubleValue());
+
+        List<CountryLanguageEntity> officialLanguages = getOfficialLanguagesIn(countryCode);
+        Optional<CountryLanguageEntity> mostSpoken = getMostSpokenLanguage(officialLanguages);
+        if (mostSpoken.isPresent()) {
+            int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
             return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
         } else {
             return 0;
         }
     }
 
-    private Optional<CountryLanguageEntity> getMostPopularOfficialLanguageInCountry(String countryCode) {
-        Optional<CountryLanguageEntity> mostSpokenOfficialLanguage = Optional.empty();
-
-        List<CountryLanguageEntity> countryLanguages = countryLanguageRepository.findAll();
-
+    private List<CountryLanguageEntity> getOfficialLanguagesIn(String countryCode) {
+        List<CountryLanguageEntity> languages = countryLanguageRepository.findAll();
         List<CountryLanguageEntity> officialLanguages = new ArrayList<>();
-        for (CountryLanguageEntity language : countryLanguages) {
+        for (CountryLanguageEntity language : languages) {
             if (language.getId().getCountryCode().equals(countryCode) && language.getIsOfficial().equals("T")) {
                 officialLanguages.add(language);
             }
         }
+        return officialLanguages;
+    }
 
-        // the country does not have any official languages
-        if (officialLanguages.isEmpty()) {
-            return mostSpokenOfficialLanguage;
+    private Optional<CountryLanguageEntity> getMostSpokenLanguage(List<CountryLanguageEntity> languages) {
+        if (languages.isEmpty()) {
+            return Optional.empty();
         }
-
-        mostSpokenOfficialLanguage = Optional.ofNullable(officialLanguages.get(0));
-        for (CountryLanguageEntity officialLanguage : officialLanguages) {
-            if (officialLanguage.getPercentage().compareTo(mostSpokenOfficialLanguage.get().getPercentage()) > 0) {
-                mostSpokenOfficialLanguage = Optional.ofNullable(officialLanguage);
+        CountryLanguageEntity mostSpokenLanguage = languages.get(0);
+        for (CountryLanguageEntity language : languages) {
+            if (language.getPercentage().compareTo(mostSpokenLanguage.getPercentage()) > 0) {
+                mostSpokenLanguage = language;
             }
         }
-
-        return mostSpokenOfficialLanguage;
-
+        return Optional.of(mostSpokenLanguage);
     }
 }
