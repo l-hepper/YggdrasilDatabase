@@ -2,6 +2,8 @@ package com.mjolnir.yggdrasil.service;
 
 import com.mjolnir.yggdrasil.entities.CityEntity;
 import com.mjolnir.yggdrasil.entities.CountryEntity;
+import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
+import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
@@ -9,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static com.mjolnir.yggdrasil.utilities.Regex.CONTINENT_REGEX;
@@ -50,6 +54,9 @@ public class WorldService {
                 countryEntity.setCapital(cityEntity.getId());
                 countryRepository.save(countryEntity);
                 logger.info("Capital city " + cityName + " added successfully for country " + countryEntity.getName() + ".");
+
+
+
             } else {
                 logger.info("City " + cityName + " added successfully for country " + countryEntity.getName() + ".");
             }
@@ -112,8 +119,9 @@ public class WorldService {
 
             String cityDistrict = "";
             String cityName = "";
+            Integer cityPopulation = 1000;
             if (hasACapital) {
-                createNewCity(countryCode, cityName, cityDistrict, population, true);
+                createNewCity(countryCode, cityName, cityDistrict, cityPopulation, true);
             }
         } else {
             if (countryCodeExists) {
@@ -166,4 +174,54 @@ public class WorldService {
             }
         }
     }
+
+    public void createNewCountryLanguage(String countryCode, String language, String isOfficial, BigDecimal percentageSpoken) {
+        // Finds country on the country table by getting it via the countryCode parameter.
+        Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
+
+        //checks if country exists, and correct parameters
+        if (countryEntityOptional.isPresent()
+                && language != null
+                && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T"))
+                && percentageSpoken.compareTo(BigDecimal.ZERO) > 0
+                && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
+
+            //Get countryEntity as an object (the whole row)
+            CountryEntity countryEntity = countryEntityOptional.get();
+
+            //Make new row in country language and country languageid tables
+            CountryLanguageIdEntity countryLanguageIdEntity = new CountryLanguageIdEntity();
+            CountryLanguageEntity countryLanguageEntity = new CountryLanguageEntity();
+
+
+            countryLanguageEntity.setCountryCode(countryEntity);
+            countryLanguageEntity.setLanguage(language);
+            countryLanguageEntity.setIsOfficial(isOfficial);
+            countryLanguageEntity.setPercentage(percentageSpoken);
+
+
+            countryLanguageRepository.save(countryLanguageEntity);
+            logger.info("Language '" + language + "' with country code " + countryCode + " added successfully.");
+
+        } else {
+            if (countryEntityOptional.isEmpty()) {
+                logger.warning("Country with code " + countryCode + " does not exist.");
+            }
+            if (language == null) {
+                logger.warning("Language cannot be null.");
+            }
+            if (percentageSpoken.compareTo(BigDecimal.ZERO) > 0) {
+                logger.warning("Percentage of spoken should be greater than zero.");
+            }
+            if (percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
+                logger.warning("Percentage of spoken should be less than 100");
+            }
+            if (isOfficial == null) {
+                logger.warning("isOfficial cannot be null.");
+            }
+        }
+    }
+
+
+
 }
