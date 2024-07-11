@@ -8,18 +8,14 @@ import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.antlr.v4.runtime.misc.Pair;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.data.util.Pair.Of;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import java.math.BigDecimal;
 
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -490,6 +486,6 @@ public class WorldService {
                 countryWithMostCities = entry.getKey();
             }
         }
-        return new Pair<>(countryWithMostCities, mostCities);
+        return Pair.of(countryWithMostCities, mostCities);
     }
 }
