@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -97,5 +98,52 @@ public class WorldService {
         }
 
         return countriesWithoutAHeadOfState;
+    }
+
+    public int getHowManyPeopleSpeakOfficialLanguageIn(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+
+        if (!country.isPresent()) {
+            return 0;
+        }
+
+        int population = country.get().getPopulation();
+        BigDecimal percentageWhoSpeaksMostPopularOfficialLanguage;
+        Optional<CountryLanguageEntity> mostPopularOfficialLanguage = getMostPopularOfficialLanguageInCountry(countryCode);
+        if (mostPopularOfficialLanguage.isPresent()) {
+            percentageWhoSpeaksMostPopularOfficialLanguage = mostPopularOfficialLanguage.get().getPercentage();
+            int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * percentageWhoSpeaksMostPopularOfficialLanguage.doubleValue());
+            return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
+        } else {
+            return 0;
+        }
+    }
+
+    private Optional<CountryLanguageEntity> getMostPopularOfficialLanguageInCountry(String countryCode) {
+        Optional<CountryLanguageEntity> mostSpokenOfficialLanguage = Optional.empty();
+
+        List<CountryLanguageEntity> countryLanguages = countryLanguageRepository.findAll();
+
+        List<CountryLanguageEntity> officialLanguages = new ArrayList<>();
+        for (CountryLanguageEntity language : countryLanguages) {
+            if (language.getId().getCountryCode().equals(countryCode) && language.getIsOfficial().equals("T")) {
+                officialLanguages.add(language);
+            }
+        }
+
+        // the country does not have any official languages
+        if (officialLanguages.isEmpty()) {
+            return mostSpokenOfficialLanguage;
+        }
+
+        mostSpokenOfficialLanguage = Optional.ofNullable(officialLanguages.get(0));
+        for (CountryLanguageEntity officialLanguage : officialLanguages) {
+            if (officialLanguage.getPercentage().compareTo(mostSpokenOfficialLanguage.get().getPercentage()) > 0) {
+                mostSpokenOfficialLanguage = Optional.ofNullable(officialLanguage);
+            }
+        }
+
+        return mostSpokenOfficialLanguage;
+
     }
 }
