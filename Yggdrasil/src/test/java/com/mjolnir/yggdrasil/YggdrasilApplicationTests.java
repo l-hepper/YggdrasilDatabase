@@ -6,16 +6,10 @@ import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
-import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
@@ -81,6 +75,7 @@ class YggdrasilApplicationTests {
         assertFalse(city.isPresent());
     }
 
+
     @Test
     @DisplayName("Create new country with valid data and no capital")
     void testCreateNewCountryWithoutCapital() {
@@ -97,22 +92,53 @@ class YggdrasilApplicationTests {
         String localName = "TestCountry";
         String governmentForm = "Republic";
         String headOfState = "Test Leader";
-        String countryCode2 = "TC";
+        String countryCode2 = "ZZ";
         boolean hasACapital = false;
 
         worldService.createNewCountry(countryCode, countryName, continent, region, surfaceArea, independenceYear,
                 population, lifeExpectancy, gnp, gnpOld, localName, governmentForm, headOfState, countryCode2,
                 hasACapital);
 
-        boolean cityExistsByCountryCode2 = countryRepository.existsByCode2(countryCode2);
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+        assertTrue(country.isPresent());
 
-        CountryEntity countryEntity = countryRepository.findById("XYZ").orElse(null);
-        if (countryEntity != null) {
-            String confirmCountryName = countryEntity.getName();
-            assertEquals(confirmCountryName, countryName);
-        }
 
     }
 
+
+    @Test
+    @DisplayName("Create new country with valid data and a capital")
+    void testCreateNewCountryWithCapital() {
+        String countryCode = "XYZ";
+        String countryName = "TestCountry";
+        String continent = "Asia";
+        String region = "Southeast Asia";
+        BigDecimal surfaceArea = new BigDecimal("100000");
+        Short independenceYear = 2000;
+        Integer population = 1000000;
+        BigDecimal lifeExpectancy = new BigDecimal("75.5");
+        BigDecimal gnp = new BigDecimal("500000");
+        BigDecimal gnpOld = new BigDecimal("400000");
+        String localName = "TestCountry";
+        String governmentForm = "Republic";
+        String headOfState = "Test Leader";
+        String countryCode2 = "ZZ";
+        boolean hasACapital = true;
+
+        worldService.createNewCountry(countryCode, countryName, continent, region, surfaceArea, independenceYear,
+                population, lifeExpectancy, gnp, gnpOld, localName, governmentForm, headOfState, countryCode2,
+                hasACapital);
+
+        CountryEntity countryEntity = countryRepository.findById(countryCode).orElse(null);
+
+        assert countryEntity != null;
+        String confirmCountryName = countryEntity.getName();
+        assertEquals(confirmCountryName, countryName);
+        assertNotNull(countryEntity);
+        assertNotNull(countryEntity.getCapital());
+
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+        assertTrue(country.isPresent());
+    }
 
 }
