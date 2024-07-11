@@ -488,4 +488,25 @@ public class WorldService {
         }
         return Pair.of(countryWithMostCities, mostCities);
     }
+
+    public Optional<CountryEntity> getCountryByName(String countryName) {
+        return countryRepository.findCountryEntityByName(countryName);
+    }
+
+    public List<CountryEntity> getCountriesByNameLike(String countryName) {
+        return countryRepository.findByNameContaining(countryName);
+    }
+
+    public List<CountryEntity> getCountriesByContinent(String continent) {
+        return countryRepository.findCountryEntitiesByContinent(continent);
+    }
+
+    public List<CountryEntity> getCountriesByRegion(String region) {
+        return countryRepository.findCountryEntitiesByRegion(region);
+    }
+
+    public List<CountryEntity> getCountriesByPopulationBetween(int lowEnd, int highEnd) {
+        return countryRepository.findCountryEntitiesByPopulationBetween(lowEnd, highEnd);
+    }
+
 }
