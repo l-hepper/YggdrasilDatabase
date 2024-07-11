@@ -8,6 +8,7 @@ import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.data.util.Pair;
@@ -330,6 +331,19 @@ public class WorldService {
         return Optional.of(mostSpokenLanguage);
     }
 
+    @Transactional
+    public List<CountryEntity> getAllCountriesThatSpeakLanguage(String language) {
+        List<CountryEntity> countriesThatSpeakLanguage = new ArrayList<>();
+        countryRepository.findAll().forEach(country -> country.getCountrylanguages().stream()
+                .filter(countryLanguage -> countryLanguage.getLanguage().equalsIgnoreCase(language))
+                .forEach(countryLanguage -> {
+                    if (countryLanguage.getIsOfficial().equals("T")) {
+                        countriesThatSpeakLanguage.add(country);
+                    }
+                }));
+        return countriesThatSpeakLanguage;
+    }
+
     // Update
     public boolean updateCityById(Integer id, CityEntity city) {
         if (id == null || city == null || city.getPopulation() < 0) {
@@ -443,20 +457,20 @@ public class WorldService {
         Map<String, Integer> districts = getDistrictPopulationMap();
 
         return districts.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue())
-               .limit(5)
-               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
-               .collect(Collectors.toList());
+                .sorted(Map.Entry.comparingByValue())
+                .limit(5)
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     public List<Pair<String, Integer>> findFiveLargestDistricts() {
         Map<String, Integer> districts = getDistrictPopulationMap();
 
         return districts.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-               .limit(5)
-               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
-               .collect(Collectors.toList());
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(5)
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     private Map<String, Integer> getDistrictPopulationMap() {
@@ -467,7 +481,7 @@ public class WorldService {
                 forEach(city -> districts.put(city.getDistrict(), districts.getOrDefault(city.getDistrict(), 0) + city.getPopulation()));
         return districts;
     }
-  
+
     public Pair<String, Integer> getCountryWithMostCities() {
         Set<CityEntity> citiesSet = new HashSet<>(cityRepository.findAll());
         Map<String, Integer> countryCityCountMap = new HashMap<>();
