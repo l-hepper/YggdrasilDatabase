@@ -10,6 +10,8 @@ import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -293,6 +295,49 @@ public class WorldService {
         return countriesWithoutAHeadOfState;
     }
 
+    public int getHowManyPeopleSpeakOfficialLanguageIn(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+
+        if (!country.isPresent()) {
+            return 0;
+        }
+
+        int population = country.get().getPopulation();
+
+        List<CountryLanguageEntity> officialLanguages = getOfficialLanguagesIn(countryCode);
+        Optional<CountryLanguageEntity> mostSpoken = getMostSpokenLanguage(officialLanguages);
+        if (mostSpoken.isPresent()) {
+            int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
+            return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
+        } else {
+            return 0;
+        }
+    }
+
+    private List<CountryLanguageEntity> getOfficialLanguagesIn(String countryCode) {
+        List<CountryLanguageEntity> languages = countryLanguageRepository.findAll();
+        List<CountryLanguageEntity> officialLanguages = new ArrayList<>();
+        for (CountryLanguageEntity language : languages) {
+            if (language.getId().getCountryCode().equals(countryCode) && language.getIsOfficial().equals("T")) {
+                officialLanguages.add(language);
+            }
+        }
+        return officialLanguages;
+    }
+
+    private Optional<CountryLanguageEntity> getMostSpokenLanguage(List<CountryLanguageEntity> languages) {
+        if (languages.isEmpty()) {
+            return Optional.empty();
+        }
+        CountryLanguageEntity mostSpokenLanguage = languages.get(0);
+        for (CountryLanguageEntity language : languages) {
+            if (language.getPercentage().compareTo(mostSpokenLanguage.getPercentage()) > 0) {
+                mostSpokenLanguage = language;
+            }
+        }
+        return Optional.of(mostSpokenLanguage);
+    }
+  
     // Update
     public boolean updateCityById(Integer id, CityEntity city){
         if (id == null || city == null) {
