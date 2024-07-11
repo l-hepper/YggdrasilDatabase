@@ -302,7 +302,7 @@ public class WorldService {
             int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
             logger.info("Most popular official language in " + country.get().getName() +
                     " is " + mostSpoken.get().getLanguage() +
-                    " with " +numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
+                    " with " + numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
                     " speakers.");
             return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
         } else {
@@ -398,6 +398,49 @@ public class WorldService {
         }
         return false;
     }
+
+    public double whatPercentageOfPopulationLivesInLargestCityIn(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+
+        if (!country.isPresent()) {
+            logger.info("Country with CountryCode:" + countryCode + " not found.");
+            return 0;
+        }
+
+        List<CityEntity> allCitiesInCountry = getAllCitiesInCountry(countryCode);
+        CityEntity largestCity = getLargestCity(allCitiesInCountry);
+
+        double countryPopulation = country.get().getPopulation();
+        double largestCityPopulation = largestCity.getPopulation();
+        double percentageOfPopulationInLargestCity = (largestCityPopulation / countryPopulation) * 100;
+        String formattedPercentage = String.format("%.2f", percentageOfPopulationInLargestCity);
+        logger.info("The largest city in " + country.get().getName() +
+                " is " + largestCity.getName() +
+                " and " + formattedPercentage +
+                "% of the total population lives there.");
+        return percentageOfPopulationInLargestCity;
+    }
+
+    private List<CityEntity> getAllCitiesInCountry(String countryCode) {
+        CountryEntity country = countryRepository.findById(countryCode).get();
+        List<CityEntity> allCities = cityRepository.findAll();
+        List<CityEntity> citiesInCountry = new ArrayList<>();
+        for (CityEntity city : allCities) {
+            if (city.getCountryCode().getCode().equals(countryCode)) {
+                citiesInCountry.add(city);
+            }
+        }
+        return citiesInCountry;
+    }
+
+    private CityEntity getLargestCity(List<CityEntity> cities) {
+        CityEntity largestCity = cities.get(0);
+        for (CityEntity city : cities) {
+            if (city.getPopulation() > largestCity.getPopulation()) {
+                largestCity = city;
+            }
+        }
+        return largestCity;
 
     public List<Pair<String, Integer>> findFiveSmallestDistricts() {
         Map<String, Integer> districts = getDistrictPopulationMap();
