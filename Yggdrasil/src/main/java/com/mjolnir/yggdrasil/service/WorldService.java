@@ -7,16 +7,12 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
-
+import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.*;
-
-
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -443,20 +439,20 @@ public class WorldService {
         Map<String, Integer> districts = getDistrictPopulationMap();
 
         return districts.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue())
-               .limit(5)
-               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
-               .collect(Collectors.toList());
+                .sorted(Map.Entry.comparingByValue())
+                .limit(5)
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     public List<Pair<String, Integer>> findFiveLargestDistricts() {
         Map<String, Integer> districts = getDistrictPopulationMap();
 
         return districts.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-               .limit(5)
-               .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
-               .collect(Collectors.toList());
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(5)
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     private Map<String, Integer> getDistrictPopulationMap() {
@@ -467,7 +463,7 @@ public class WorldService {
                 forEach(city -> districts.put(city.getDistrict(), districts.getOrDefault(city.getDistrict(), 0) + city.getPopulation()));
         return districts;
     }
-  
+
     public Pair<String, Integer> getCountryWithMostCities() {
         Set<CityEntity> citiesSet = new HashSet<>(cityRepository.findAll());
         Map<String, Integer> countryCityCountMap = new HashMap<>();
@@ -509,4 +505,77 @@ public class WorldService {
         return countryRepository.findCountryEntitiesByPopulationBetween(lowEnd, highEnd);
     }
 
+    public CityEntity getCityById(Integer id) {
+        Optional<CityEntity> cityOptional = cityRepository.findById(id);
+        if (cityOptional.isPresent()) {
+            return cityOptional.get();
+        } else {
+            throw new IllegalArgumentException("City with ID " + id + " not found");
+        }
+    }
+
+    public List<CityEntity> getAllCities() {
+        return cityRepository.findAll();
+    }
+
+    public List<CityEntity> getCitiesByCountryCode(String countryCode) {
+        List<CityEntity> cities = cityRepository.findAll().stream().
+                filter(city -> city.getCountryCode().getCode().equals(countryCode))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("Cities with country code " + countryCode + " not found");
+        } else {
+            return cities;
+        }
+
+    }
+
+    public List<CityEntity> getCitiesByName(String name) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (name.isEmpty()) {
+            return List.of();
+        }
+        return cities.stream()
+                .filter(city -> city.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+    }
+
+    public List<CityEntity> getCitiesByDistrict(String district) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (district.isEmpty()) {
+            return List.of();
+        }
+        cities = cities.stream()
+                .filter(city -> city.getDistrict().toLowerCase().contains(district.toLowerCase()))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("No cities found for district " + district);
+        } else {
+            return cities;
+        }
+    }
+
+    public List<CityEntity> getCitiesByMinPopulation(int minPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (minPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() >= minPopulation)
+                    .collect(Collectors.toList());
+
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + minPopulation);
+        }
+    }
+
+    public List<CityEntity> getCitiesByMaxPopulation(int maxPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (maxPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() <= maxPopulation)
+                    .collect(Collectors.toList());
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + maxPopulation);
+        }
+
+    }
 }
