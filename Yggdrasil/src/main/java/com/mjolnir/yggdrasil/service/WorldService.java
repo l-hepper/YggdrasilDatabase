@@ -111,52 +111,52 @@ public class WorldService {
             }
         } else {
             if (countryCodeExists) {
-                System.out.println("Country with code '" + countryCode + "' already exists.");
+                logger.warning("Country with code '" + countryCode + "' already exists.");
             }
             if (countryCode2Exists) {
-                System.out.println("Country with code2 '" + countryCode2 + "' already exists.");
+                logger.warning("Country with code2 '" + countryCode2 + "' already exists.");
             }
             if (countryName == null || countryName.length() >= 52) {
-                System.out.println("Country name is null or exceeds 52 characters.");
+                logger.warning("Country name is null or exceeds 52 characters.");
             }
             if (!continent.matches(CONTINENT_REGEX)) {
-                System.out.println("Continent '" + continent + "' does not match valid continents.");
+                logger.warning("Continent '" + continent + "' does not match valid continents.");
             }
             if (!(region.matches(REGION_REGEX) && region.length() < 26)) {
-                System.out.println("Region '" + region + "' does not match valid regions or exceeds 26 characters.");
+                logger.warning("Region '" + region + "' does not match valid regions or exceeds 26 characters.");
             }
             if (!(surfaceArea.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("Surface area should be greater than zero.");
+                logger.warning("Surface area should be greater than zero.");
             }
             if (!(independenceYear == null || independenceYear > 0)) {
-                System.out.println("Independence year should be null or greater than zero.");
+                logger.warning("Independence year should be null or greater than zero.");
             }
             if (!(population == null || population > 0)) {
-                System.out.println("Population should be null or greater than zero.");
+                logger.warning("Population should be null or greater than zero.");
             }
             if (!(lifeExpectancy == null || lifeExpectancy.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("Life expectancy should be null or greater than zero.");
+                logger.warning("Life expectancy should be null or greater than zero.");
             }
             if (!(GNP == null || GNP.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("GNP should be null or greater than zero.");
+                logger.warning("GNP should be null or greater than zero.");
             }
             if (!(GNPOld == null || GNPOld.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("GNPOld should be null or greater than zero.");
+                logger.warning("GNPOld should be null or greater than zero.");
             }
             if (localName == null || localName.length() >= 45) {
-                System.out.println("Local name is null or exceeds 45 characters.");
+                logger.warning("Local name is null or exceeds 45 characters.");
             }
             if (governmentForm == null) {
-                System.out.println("Government form is null.");
+                logger.warning("Government form is null.");
             }
             if (!(headOfState == null || !headOfState.isEmpty())) {
-                System.out.println("Head of state is null or empty.");
+                logger.warning("Head of state is null or empty.");
             }
             if (!(countryCode2 != null && countryCode2.length() == 2)) {
-                System.out.println("Country code2 should not be null and must be exactly 2 characters.");
+                logger.warning("Country code2 should not be null and must be exactly 2 characters.");
             }
             if (!(countryCode.length() == 3)) {
-                System.out.println("Country code must be exactly 3 characters.");
+                logger.warning("Country code must be exactly 3 characters.");
             }
         }
     }
