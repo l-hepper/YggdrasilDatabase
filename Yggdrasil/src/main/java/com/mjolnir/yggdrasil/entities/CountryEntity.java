@@ -3,6 +3,7 @@ package com.mjolnir.yggdrasil.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public class CountryEntity {
     @Size(max = 3)
     @ColumnDefault("''")
     @Column(name = "Code", nullable = false, length = 3)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private String code;
 
     @Size(max = 52)
@@ -83,10 +85,10 @@ public class CountryEntity {
     @Column(name = "Code2", nullable = false, length = 2)
     private String code2;
 
-    @OneToMany(mappedBy = "countryEntityCode")
+    @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CityEntity> cities = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "countryEntityCode")
+    @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CountryLanguageEntity> countryLanguageEntities = new LinkedHashSet<>();
 
     public String getCode() {
