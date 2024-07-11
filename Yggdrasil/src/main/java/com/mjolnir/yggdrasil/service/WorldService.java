@@ -7,18 +7,14 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
-import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Logger;
 import static com.mjolnir.yggdrasil.utilities.Regex.CONTINENT_REGEX;
 import static com.mjolnir.yggdrasil.utilities.Regex.REGION_REGEX;
@@ -397,4 +393,29 @@ public class WorldService {
         }
         return false;
     }
+
+    public Pair<String, Integer> getCountryWithMostCities() {
+
+
+        Set<CityEntity> citiesSet = new HashSet<>(cityRepository.findAll());
+        Map<String, Integer> countryCityCountMap = new HashMap<>();
+
+        for (CityEntity city : citiesSet) {
+            String countryCode = city.getCountryCode().getCode();
+            countryCityCountMap.put(countryCode, countryCityCountMap.getOrDefault(countryCode, 0) + 1);
+        }
+
+        String countryWithMostCities = null;
+        int maxCities = 0;
+
+        for (Map.Entry<String, Integer> entry : countryCityCountMap.entrySet()) {
+            if (entry.getValue() > maxCities) {
+                maxCities = entry.getValue();
+                countryWithMostCities = entry.getKey();
+            }
+        }
+        return new Pair<>(countryWithMostCities, maxCities);
+    }
+
+
 }
