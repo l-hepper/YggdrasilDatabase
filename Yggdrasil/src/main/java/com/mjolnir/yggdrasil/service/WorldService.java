@@ -7,7 +7,10 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+
 import jakarta.persistence.criteria.CriteriaBuilder;
+import org.antlr.v4.runtime.misc.Pair;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.data.util.Pair;
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+
 import java.math.BigDecimal;
+
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -212,8 +217,10 @@ public class WorldService {
 
         if (country.isPresent()) {
             countryRepository.delete(country.get());
+            logger.info("Country with code " + countryCode + ": " + country.get().getName() + " is successfully deleted.");
             return true;
         } else {
+            logger.info("Country with code " + countryCode + " does not exist.");
             return false;
         }
     }
@@ -223,8 +230,10 @@ public class WorldService {
 
         if (city.isPresent()) {
             cityRepository.delete(city.get());
+            logger.info("City with ID " + cityID + " is successfully deleted.");
             return true;
         } else {
+            logger.info("City with ID " + cityID + " does not exist.");
             return false;
         }
     }
@@ -237,8 +246,10 @@ public class WorldService {
         Optional<CountryLanguageEntity> countryLanguage = countryLanguageRepository.findById(primaryKey);
         if (countryLanguage.isPresent()) {
             countryLanguageRepository.delete(countryLanguage.get());
+            logger.info("CountryLanguage with CountryCode: " + countryCode + " and Language: " + language + " is successfully deleted.");
             return true;
         } else {
+            logger.info("CountryLanguage with CountryCode: " + countryCode + " or Language: " + language + " does not exist.");
             return false;
         }
     }
@@ -254,8 +265,10 @@ public class WorldService {
 
         List<CountryLanguageEntity> newCountryLanguages = countryLanguageRepository.findAll();
         if (newCountryLanguages.size() < countryLanguages.size()) {
+            logger.info("All instances of Language:" + languageToDelete + " have been deleted.");
             return true;
         } else {
+            logger.info("No instances of Language:" + languageToDelete + " found.");
             return false;
         }
     }
@@ -270,6 +283,7 @@ public class WorldService {
             }
         }
 
+        logger.info("Returning list of size:" + countriesWithoutAHeadOfState.size() + " without a head of state.");
         return countriesWithoutAHeadOfState;
     }
 
@@ -286,6 +300,10 @@ public class WorldService {
         Optional<CountryLanguageEntity> mostSpoken = getMostSpokenLanguage(officialLanguages);
         if (mostSpoken.isPresent()) {
             int numberOfPeopleWhoSpeakMostPopularOfficialLanguage = (int) ((population / 100) * mostSpoken.get().getPercentage().doubleValue());
+            logger.info("Most popular official language in " + country.get().getName() +
+                    " is " + mostSpoken.get().getLanguage() +
+                    " with " +numberOfPeopleWhoSpeakMostPopularOfficialLanguage +
+                    " speakers.");
             return numberOfPeopleWhoSpeakMostPopularOfficialLanguage;
         } else {
             return 0;
@@ -408,5 +426,26 @@ public class WorldService {
                 filter(city -> city.getDistrict() != null).
                 forEach(city -> districts.put(city.getDistrict(), districts.getOrDefault(city.getDistrict(), 0) + city.getPopulation()));
         return districts;
+    }
+  
+    public Pair<String, Integer> getCountryWithMostCities() {
+        Set<CityEntity> citiesSet = new HashSet<>(cityRepository.findAll());
+        Map<String, Integer> countryCityCountMap = new HashMap<>();
+
+        for (CityEntity city : citiesSet) {
+            String countryCode = city.getCountryCode().getCode();
+            countryCityCountMap.put(countryCode, countryCityCountMap.getOrDefault(countryCode, 0) + 1);
+        }
+
+        String countryWithMostCities = null;
+        int mostCities = 0;
+
+        for (Map.Entry<String, Integer> entry : countryCityCountMap.entrySet()) {
+            if (entry.getValue() > mostCities) {
+                mostCities = entry.getValue();
+                countryWithMostCities = entry.getKey();
+            }
+        }
+        return new Pair<>(countryWithMostCities, mostCities);
     }
 }
