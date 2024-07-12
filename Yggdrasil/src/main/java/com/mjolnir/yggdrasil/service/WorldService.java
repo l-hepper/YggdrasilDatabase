@@ -7,6 +7,9 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -320,6 +323,19 @@ public class WorldService {
         return Optional.of(mostSpokenLanguage);
     }
 
+    @Transactional
+    public List<CountryEntity> getAllCountriesThatSpeakLanguage(String language) {
+        List<CountryEntity> countriesThatSpeakLanguage = new ArrayList<>();
+        countryRepository.findAll().forEach(country -> country.getCountrylanguages().stream()
+                .filter(countryLanguage -> countryLanguage.getLanguage().equalsIgnoreCase(language))
+                .forEach(countryLanguage -> {
+                    if (countryLanguage.getIsOfficial().equals("T")) {
+                        countriesThatSpeakLanguage.add(country);
+                    }
+                }));
+        return countriesThatSpeakLanguage;
+    }
+
     // Update
     public boolean updateCityById(Integer id, CityEntity city) {
         if (id == null || city == null || city.getPopulation() < 0) {
@@ -479,6 +495,10 @@ public class WorldService {
         return Pair.of(countryWithMostCities, mostCities);
     }
 
+    public List<CountryLanguageEntity> getLanguagesByCountryCode(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+        return country.map(countryEntity -> countryEntity.getCountrylanguages().stream().toList()).orElse(Collections.emptyList());
+
     public Optional<CountryEntity> getCountryByName(String countryName) {
         return countryRepository.findCountryEntityByName(countryName);
     }
@@ -570,6 +590,5 @@ public class WorldService {
         } else {
             throw new IllegalArgumentException("You cannot enter a negative population of: " + maxPopulation);
         }
-
     }
 }
