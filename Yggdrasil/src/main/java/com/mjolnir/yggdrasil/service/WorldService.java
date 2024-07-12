@@ -498,6 +498,7 @@ public class WorldService {
     public List<CountryLanguageEntity> getLanguagesByCountryCode(String countryCode) {
         Optional<CountryEntity> country = countryRepository.findById(countryCode);
         return country.map(countryEntity -> countryEntity.getCountrylanguages().stream().toList()).orElse(Collections.emptyList());
+    }
 
     public Optional<CountryEntity> getCountryByName(String countryName) {
         return countryRepository.findCountryEntityByName(countryName);
