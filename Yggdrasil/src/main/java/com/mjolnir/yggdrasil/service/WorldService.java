@@ -9,15 +9,13 @@ import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 
 import jakarta.transaction.Transactional;
+
+import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.*;
-
-
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -116,76 +114,70 @@ public class WorldService {
             }
         } else {
             if (countryCodeExists) {
-                System.out.println("Country with code '" + countryCode + "' already exists.");
+                logger.warning("Country with code '" + countryCode + "' already exists.");
             }
             if (countryCode2Exists) {
-                System.out.println("Country with code2 '" + countryCode2 + "' already exists.");
+                logger.warning("Country with code2 '" + countryCode2 + "' already exists.");
             }
             if (countryName == null || countryName.length() >= 52) {
-                System.out.println("Country name is null or exceeds 52 characters.");
+                logger.warning("Country name is null or exceeds 52 characters.");
             }
             if (!continent.matches(CONTINENT_REGEX)) {
-                System.out.println("Continent '" + continent + "' does not match valid continents.");
+                logger.warning("Continent '" + continent + "' does not match valid continents.");
             }
             if (!(region.matches(REGION_REGEX) && region.length() < 26)) {
-                System.out.println("Region '" + region + "' does not match valid regions or exceeds 26 characters.");
+                logger.warning("Region '" + region + "' does not match valid regions or exceeds 26 characters.");
             }
             if (!(surfaceArea.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("Surface area should be greater than zero.");
+                logger.warning("Surface area should be greater than zero.");
             }
             if (!(independenceYear == null || independenceYear > 0)) {
-                System.out.println("Independence year should be null or greater than zero.");
+                logger.warning("Independence year should be null or greater than zero.");
             }
             if (!(population == null || population > 0)) {
-                System.out.println("Population should be null or greater than zero.");
+                logger.warning("Population should be null or greater than zero.");
             }
             if (!(lifeExpectancy == null || lifeExpectancy.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("Life expectancy should be null or greater than zero.");
+                logger.warning("Life expectancy should be null or greater than zero.");
             }
             if (!(GNP == null || GNP.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("GNP should be null or greater than zero.");
+                logger.warning("GNP should be null or greater than zero.");
             }
             if (!(GNPOld == null || GNPOld.compareTo(BigDecimal.ZERO) > 0)) {
-                System.out.println("GNPOld should be null or greater than zero.");
+                logger.warning("GNPOld should be null or greater than zero.");
             }
             if (localName == null || localName.length() >= 45) {
-                System.out.println("Local name is null or exceeds 45 characters.");
+                logger.warning("Local name is null or exceeds 45 characters.");
             }
             if (governmentForm == null) {
-                System.out.println("Government form is null.");
+                logger.warning("Government form is null.");
             }
             if (!(headOfState == null || !headOfState.isEmpty())) {
-                System.out.println("Head of state is null or empty.");
+                logger.warning("Head of state is null or empty.");
             }
             if (!(countryCode2 != null && countryCode2.length() == 2)) {
-                System.out.println("Country code2 should not be null and must be exactly 2 characters.");
+                logger.warning("Country code2 should not be null and must be exactly 2 characters.");
             }
             if (!(countryCode.length() == 3)) {
-                System.out.println("Country code must be exactly 3 characters.");
+                logger.warning("Country code must be exactly 3 characters.");
             }
         }
     }
 
     public void createNewCountryLanguage(String countryCode, String language, String isOfficial, BigDecimal percentageSpoken) {
-        // Finds country on the country table by getting it via the countryCode parameter.
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
 
-        //checks if country exists, and correct parameters
         if (countryEntityOptional.isPresent() && language != null && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T")) && percentageSpoken.compareTo(BigDecimal.ZERO) > 0 && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
 
-            //Get countryEntity as an object (the whole row)
             CountryEntity countryEntity = countryEntityOptional.get();
 
-            //Make new row in country language and country languageid tables
             CountryLanguageIdEntity countryLanguageIdEntity = new CountryLanguageIdEntity();
             CountryLanguageEntity countryLanguageEntity = new CountryLanguageEntity();
-
 
             countryLanguageEntity.setCountryCode(countryEntity);
             countryLanguageEntity.setLanguage(language);
             countryLanguageEntity.setIsOfficial(isOfficial);
             countryLanguageEntity.setPercentage(percentageSpoken);
-
 
             countryLanguageRepository.save(countryLanguageEntity);
             logger.info("Language '" + language + "' with country code " + countryCode + " added successfully.");
@@ -506,5 +498,97 @@ public class WorldService {
     public List<CountryLanguageEntity> getLanguagesByCountryCode(String countryCode) {
         Optional<CountryEntity> country = countryRepository.findById(countryCode);
         return country.map(countryEntity -> countryEntity.getCountrylanguages().stream().toList()).orElse(Collections.emptyList());
+
+    public Optional<CountryEntity> getCountryByName(String countryName) {
+        return countryRepository.findCountryEntityByName(countryName);
+    }
+
+    public List<CountryEntity> getCountriesByNameLike(String countryName) {
+        return countryRepository.findByNameContaining(countryName);
+    }
+
+    public List<CountryEntity> getCountriesByContinent(String continent) {
+        return countryRepository.findCountryEntitiesByContinent(continent);
+    }
+
+    public List<CountryEntity> getCountriesByRegion(String region) {
+        return countryRepository.findCountryEntitiesByRegion(region);
+    }
+
+    public List<CountryEntity> getCountriesByPopulationBetween(int lowEnd, int highEnd) {
+        return countryRepository.findCountryEntitiesByPopulationBetween(lowEnd, highEnd);
+    }
+
+    public CityEntity getCityById(Integer id) {
+        Optional<CityEntity> cityOptional = cityRepository.findById(id);
+        if (cityOptional.isPresent()) {
+            return cityOptional.get();
+        } else {
+            throw new IllegalArgumentException("City with ID " + id + " not found");
+        }
+    }
+
+    public List<CityEntity> getAllCities() {
+        return cityRepository.findAll();
+    }
+
+    public List<CityEntity> getCitiesByCountryCode(String countryCode) {
+        List<CityEntity> cities = cityRepository.findAll().stream().
+                filter(city -> city.getCountryCode().getCode().equals(countryCode))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("Cities with country code " + countryCode + " not found");
+        } else {
+            return cities;
+        }
+
+    }
+
+    public List<CityEntity> getCitiesByName(String name) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (name.isEmpty()) {
+            return List.of();
+        }
+        return cities.stream()
+                .filter(city -> city.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+    }
+
+    public List<CityEntity> getCitiesByDistrict(String district) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (district.isEmpty()) {
+            return List.of();
+        }
+        cities = cities.stream()
+                .filter(city -> city.getDistrict().toLowerCase().contains(district.toLowerCase()))
+                .toList();
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("No cities found for district " + district);
+        } else {
+            return cities;
+        }
+    }
+
+    public List<CityEntity> getCitiesByMinPopulation(int minPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (minPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() >= minPopulation)
+                    .collect(Collectors.toList());
+
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + minPopulation);
+        }
+    }
+
+    public List<CityEntity> getCitiesByMaxPopulation(int maxPopulation) {
+        List<CityEntity> cities = cityRepository.findAll();
+        if (maxPopulation >= 0) {
+            return cities.stream()
+                    .filter(city -> city.getPopulation() <= maxPopulation)
+                    .collect(Collectors.toList());
+        } else {
+            throw new IllegalArgumentException("You cannot enter a negative population of: " + maxPopulation);
+        }
     }
 }
