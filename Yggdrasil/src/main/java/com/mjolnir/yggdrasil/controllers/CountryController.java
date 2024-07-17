@@ -5,6 +5,7 @@ import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +45,17 @@ public class CountryController {
     public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country) {
         CountryEntity countryEntity = countryRepository.save(country);
         return ResponseEntity.ok(countryEntity);
+    }
+
+    @PutMapping
+    public ResponseEntity<CountryEntity> updateCountry(@RequestBody CountryEntity country) {
+        CountryEntity countryEntity = countryRepository.save(country);
+        return ResponseEntity.ok(countryEntity);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id) {
+        countryRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
