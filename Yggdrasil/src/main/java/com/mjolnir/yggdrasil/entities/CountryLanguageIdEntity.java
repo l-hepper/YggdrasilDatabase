@@ -1,5 +1,6 @@
 package com.mjolnir.yggdrasil.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class CountryLanguageIdEntity implements Serializable {
     @Column(name = "Language", nullable = false, length = 30)
     private String language;
 
+    @JsonBackReference
     public String getCountryCode() {
         return countryCode;
     }

@@ -1,5 +1,7 @@
 package com.mjolnir.yggdrasil.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -86,9 +88,11 @@ public class CountryEntity {
     private String code2;
 
     @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Set<CityEntity> cities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Set<CountryLanguageEntity> countryLanguageEntities = new LinkedHashSet<>();
 
     public String getCode() {
@@ -219,6 +223,7 @@ public class CountryEntity {
         this.cities = cities;
     }
 
+    @JsonBackReference
     public Set<CountryLanguageEntity> getCountrylanguages() {
         return countryLanguageEntities;
     }
