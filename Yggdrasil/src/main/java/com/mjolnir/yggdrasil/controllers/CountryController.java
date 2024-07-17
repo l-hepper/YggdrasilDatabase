@@ -5,11 +5,15 @@ import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.ReflectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,5 +61,41 @@ public class CountryController {
     public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id) {
         countryRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<CountryEntity> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates) {
+        Optional<CountryEntity> optionalCountry = countryRepository.findById(id);
+
+        if (!optionalCountry.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CountryEntity country = optionalCountry.get();
+
+        for (Map.Entry<String, Object> entry : updates.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            switch (key) {
+                case "name" -> country.setName((String) value);
+                case "continent" -> country.setContinent((String) value);
+                case "region" -> country.setRegion((String) value);
+                case "surfaceArea" -> country.setSurfaceArea(new BigDecimal(value.toString()));
+                case "indepYear" -> country.setIndepYear(Short.parseShort(value.toString()));
+                case "population" -> country.setPopulation(Integer.parseInt(value.toString()));
+                case "lifeExpectancy" -> country.setLifeExpectancy(new BigDecimal(value.toString()));
+                case "gnp" -> country.setGnp(new BigDecimal(value.toString()));
+                case "localName" -> country.setLocalName((String) value);
+                case "governmentForm" -> country.setGovernmentForm((String) value);
+                case "headOfState" -> country.setHeadOfState((String) value);
+                case "capital" -> country.setCapital(Integer.parseInt(value.toString()));
+                case "code2" -> country.setCode2((String) value);
+                case "gnpold" -> country.setGNPOld(new BigDecimal(value.toString()));
+            }
+        }
+
+        CountryEntity updatedCountry = countryRepository.save(country);
+        return ResponseEntity.ok(updatedCountry);
     }
 }
