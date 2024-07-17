@@ -1,6 +1,7 @@
 package com.mjolnir.yggdrasil.controllers;
 
 import com.mjolnir.yggdrasil.entities.CountryEntity;
+import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
@@ -40,7 +41,7 @@ public class CountryController {
     public ResponseEntity<CountryEntity> getCountries(@PathVariable String id) {
         Optional<CountryEntity> country = countryRepository.findById(id);
         if (!country.isPresent()) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
         return ResponseEntity.ok(country.get());
     }
@@ -59,6 +60,11 @@ public class CountryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id) {
+        Optional<CountryEntity> country = countryRepository.findById(id);
+        if (!country.isPresent()) {
+            throw new ResourceNotFoundException("Country with id " + id + " not found");
+        }
+
         countryRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -68,7 +74,7 @@ public class CountryController {
         Optional<CountryEntity> optionalCountry = countryRepository.findById(id);
 
         if (!optionalCountry.isPresent()) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
 
         CountryEntity country = optionalCountry.get();
@@ -92,6 +98,7 @@ public class CountryController {
                 case "capital" -> country.setCapital(Integer.parseInt(value.toString()));
                 case "code2" -> country.setCode2((String) value);
                 case "gnpold" -> country.setGNPOld(new BigDecimal(value.toString()));
+                default -> throw new ResourceNotFoundException("The field '" + key + "' is not valid.");
             }
         }
 
