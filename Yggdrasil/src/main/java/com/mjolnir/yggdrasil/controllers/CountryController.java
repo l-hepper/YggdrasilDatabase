@@ -7,6 +7,7 @@ import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.ReflectionUtils;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/countries")
@@ -38,12 +42,16 @@ public class CountryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CountryEntity> getCountries(@PathVariable String id) {
+    public ResponseEntity<EntityModel<CountryEntity>> getCountry(@PathVariable String id) {
         Optional<CountryEntity> country = countryRepository.findById(id);
         if (!country.isPresent()) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
-        return ResponseEntity.ok(country.get());
+
+        EntityModel<CountryEntity> resource = EntityModel.of(country.get());
+        resource.add(linkTo(methodOn(CountryController.class).getCountry(id)).withSelfRel());
+        resource.add(linkTo(methodOn(CountryController.class).getCountries()).withRel("all-countries"));
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     @PostMapping
