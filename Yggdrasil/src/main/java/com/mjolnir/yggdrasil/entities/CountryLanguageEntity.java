@@ -18,7 +18,6 @@ public class CountryLanguageEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @ColumnDefault("''")
     @JoinColumn(name = "CountryCode", nullable = false)
-    @JsonBackReference
     private CountryEntity countryEntityCode;
 
     @NotNull

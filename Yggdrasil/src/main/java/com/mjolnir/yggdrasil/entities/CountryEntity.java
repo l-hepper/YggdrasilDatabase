@@ -88,11 +88,9 @@ public class CountryEntity {
     private String code2;
 
     @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
     private Set<CityEntity> cities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "countryEntityCode", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
     private Set<CountryLanguageEntity> countryLanguageEntities = new LinkedHashSet<>();
 
     public String getCode() {

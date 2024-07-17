@@ -26,7 +26,6 @@ public class CountryLanguageIdEntity implements Serializable {
     @Column(name = "Language", nullable = false, length = 30)
     private String language;
 
-    @JsonBackReference
     public String getCountryCode() {
         return countryCode;
     }
