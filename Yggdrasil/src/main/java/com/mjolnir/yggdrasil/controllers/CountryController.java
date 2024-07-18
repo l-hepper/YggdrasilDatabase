@@ -5,12 +5,14 @@ import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.WorldService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -55,7 +57,12 @@ public class CountryController {
     }
 
     @PostMapping
-    public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country) {
+    public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
+
+        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+        }
+
         CountryEntity countryEntity = null;
         try {
             worldService.createNewCountry(
@@ -82,13 +89,23 @@ public class CountryController {
     }
 
     @PutMapping
-    public ResponseEntity<CountryEntity> updateCountry(@RequestBody CountryEntity country) {
+    public ResponseEntity<CountryEntity> updateCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
+
+        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+        }
+
         CountryEntity countryEntity = countryRepository.save(country);
         return ResponseEntity.ok(countryEntity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id) {
+    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id, HttpServletRequest request) {
+
+        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+        }
+
         boolean deleted = worldService.deleteCountryByCode(id);
         if (!deleted) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
@@ -98,9 +115,13 @@ public class CountryController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CountryEntity> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates) {
-        Optional<CountryEntity> optionalCountry = worldService.getCountryByCode(id);
+    public ResponseEntity<CountryEntity> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates, HttpServletRequest request) {
 
+        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+        }
+
+        Optional<CountryEntity> optionalCountry = worldService.getCountryByCode(id);
         if (!optionalCountry.isPresent()) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
