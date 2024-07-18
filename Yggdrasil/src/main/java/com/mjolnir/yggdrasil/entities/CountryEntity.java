@@ -217,11 +217,12 @@ public class CountryEntity {
         return cities;
     }
 
+    @JsonBackReference(value = "country-cities")
     public void setCities(Set<CityEntity> cities) {
         this.cities = cities;
     }
 
-    @JsonBackReference
+    @JsonBackReference(value = "country-languages")
     public Set<CountryLanguageEntity> getCountrylanguages() {
         return countryLanguageEntities;
     }
