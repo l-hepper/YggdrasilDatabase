@@ -2,7 +2,6 @@ package com.mjolnir.yggdrasil.controllers;
 
 import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,8 @@ public class MjolnirApiController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getLanguageById(@RequestParam String role, HttpServletRequest request) {
-        String requestRole = mjolnirApiService.getRoleFromApiKey(request.getHeader("MJOLNIR-API-KEY"));
+    public ResponseEntity<String> getLanguageById(@RequestParam String role, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
         if(requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
 
