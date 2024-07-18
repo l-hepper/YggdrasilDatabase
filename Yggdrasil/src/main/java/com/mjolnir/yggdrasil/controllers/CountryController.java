@@ -37,13 +37,13 @@ public class CountryController {
 
     @GetMapping
     public List<CountryEntity> getCountries() {
-        List<CountryEntity> countries = countryRepository.findAll();
+        List<CountryEntity> countries = worldService.getAllCountries();
         return countries;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<CountryEntity>> getCountry(@PathVariable String id) {
-        Optional<CountryEntity> country = countryRepository.findById(id);
+        Optional<CountryEntity> country = worldService.getCountryByCode(id);
         if (!country.isPresent()) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
@@ -58,7 +58,23 @@ public class CountryController {
     public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country) {
         CountryEntity countryEntity = null;
         try {
-            countryEntity = countryRepository.save(country);
+            worldService.createNewCountry(
+                    country.getCode(),
+                    country.getName(),
+                    country.getContinent(),
+                    country.getRegion(),
+                    country.getSurfaceArea(),
+                    country.getIndepYear(),
+                    country.getPopulation(),
+                    country.getLifeExpectancy(),
+                    country.getGnp(),
+                    country.getGNPOld(),
+                    country.getLocalName(),
+                    country.getGovernmentForm(),
+                    country.getHeadOfState(),
+                    country.getCode2(),
+                    true
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,18 +89,17 @@ public class CountryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id) {
-        Optional<CountryEntity> country = countryRepository.findById(id);
-        if (!country.isPresent()) {
+        boolean deleted = worldService.deleteCountryByCode(id);
+        if (!deleted) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
 
-        countryRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<CountryEntity> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates) {
-        Optional<CountryEntity> optionalCountry = countryRepository.findById(id);
+        Optional<CountryEntity> optionalCountry = worldService.getCountryByCode(id);
 
         if (!optionalCountry.isPresent()) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");

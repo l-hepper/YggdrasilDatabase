@@ -520,6 +520,14 @@ public class WorldService {
         return countryRepository.findCountryEntitiesByPopulationBetween(lowEnd, highEnd);
     }
 
+    public List<CountryEntity> getAllCountries() {
+        return countryRepository.findAll();
+    }
+
+    public Optional<CountryEntity> getCountryByCode(String countryCode) {
+        return countryRepository.findById(countryCode);
+    }
+
     public CityEntity getCityById(Integer id) {
         Optional<CityEntity> cityOptional = cityRepository.findById(id);
         if (cityOptional.isPresent()) {
