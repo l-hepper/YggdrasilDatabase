@@ -59,7 +59,7 @@ public class LanguageController {
     public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language) {
         EntityModel<CountryLanguageEntity> languageEntity = worldService.getLanguageById(countryCode, language)
                 .map(lang -> {
-                    Link countryLink = Link.of("/countries/" + countryCode).withRel(countryCode);
+                    Link countryLink = Link.of("http://localhost:8080/Yggdrasil/countries/" + countryCode).withRel(countryCode);
                     Link selfLink = WebMvcLinkBuilder.linkTo(
                             methodOn(LanguageController.class).getLanguageById(lang.getCountryCode().getCode(), lang.getLanguage())).withSelfRel();
                     Link relLink = WebMvcLinkBuilder.linkTo(
@@ -77,7 +77,7 @@ public class LanguageController {
         List<EntityModel<CountryLanguageEntity>> resources = languages.stream()
                 .map(language -> {
                     String countryCode = language.getCountryCode().getCode();
-                    Link countryLink = Link.of("/countries/" + countryCode).withRel(countryCode);
+                    Link countryLink = Link.of("http://localhost:8080/Yggdrasil/countries/" + countryCode).withRel(countryCode);
                     Link selfLink = WebMvcLinkBuilder.linkTo(
                             methodOn(LanguageController.class).getLanguageById(language.getCountryCode().getCode(), language.getLanguage())).withSelfRel();
                     Link relLink = WebMvcLinkBuilder.linkTo(
