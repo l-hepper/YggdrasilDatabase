@@ -19,7 +19,7 @@ public class MjolnirApiController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getLanguageById(@RequestParam String role, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+    public ResponseEntity<String> generateNewApiKey(@RequestParam String role, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
         String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
         if(requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
