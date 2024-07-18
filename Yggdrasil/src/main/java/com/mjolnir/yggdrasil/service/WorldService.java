@@ -620,4 +620,9 @@ public class WorldService {
     public List<CountryLanguageEntity> getAllLanguages() {
         return countryLanguageRepository.findAll();
     }
+
+    public boolean isValidCountryCode(String countryCode) {
+        Optional<CountryEntity> country = countryRepository.findById(countryCode);
+        return country.isPresent();
+    }
 }
