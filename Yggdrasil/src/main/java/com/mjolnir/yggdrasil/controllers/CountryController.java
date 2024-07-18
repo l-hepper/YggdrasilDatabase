@@ -57,7 +57,7 @@ public class CountryController {
     }
 
     @PostMapping
-    public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<CountryEntity>> createCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
 
         if(!request.getAttribute("role").equals("FULL_ACCESS")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
@@ -85,18 +85,25 @@ public class CountryController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.ok(countryEntity);
+
+        EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
+        resource.add(linkTo(methodOn(CountryController.class).getCountry(country.getCode())).withSelfRel());
+        resource.add(linkTo(methodOn(CountryController.class).getCountries()).withRel("all-countries"));
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<CountryEntity> updateCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<CountryEntity>> updateCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
 
         if(!request.getAttribute("role").equals("FULL_ACCESS")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
         }
 
         CountryEntity countryEntity = countryRepository.save(country);
-        return ResponseEntity.ok(countryEntity);
+        EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
+        resource.add(linkTo(methodOn(CountryController.class).getCountry(country.getCode())).withSelfRel());
+        resource.add(linkTo(methodOn(CountryController.class).getCountries()).withRel("all-countries"));
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -115,7 +122,7 @@ public class CountryController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CountryEntity> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<CountryEntity>> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates, HttpServletRequest request) {
 
         if(!request.getAttribute("role").equals("FULL_ACCESS")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
@@ -150,7 +157,10 @@ public class CountryController {
                 default -> throw new ResourceNotFoundException("The field '" + key + "' is not valid.");
             }
         }
+        
         CountryEntity updatedCountry = countryRepository.save(country);
-        return ResponseEntity.ok(updatedCountry);
+        EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
+        resource.add(linkTo(methodOn(CountryController.class).getCountry(country.getCode())).withSelfRel());
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 }
