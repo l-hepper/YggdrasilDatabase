@@ -1,5 +1,6 @@
 package com.mjolnir.yggdrasil.service;
 
+import com.mjolnir.yggdrasil.dto.CityDTO;
 import com.mjolnir.yggdrasil.entities.CityEntity;
 import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
@@ -8,6 +9,7 @@ import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 
+import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.util.Pair;
@@ -339,7 +341,7 @@ public class WorldService {
     }
 
     // Update
-    public boolean updateCityById(Integer id, CityEntity city) {
+    public boolean updateCityById(Integer id, CityDTO city) {
         if (id == null || city == null || city.getPopulation() < 0) {
             return false;
         }
@@ -537,6 +539,10 @@ public class WorldService {
         } else {
             throw new IllegalArgumentException("City with ID " + id + " not found");
         }
+    }
+
+    public Optional<CityEntity> getCityOptionalById(Integer id) {
+        return cityRepository.findById(id);
     }
 
     public List<CityEntity> getAllCities() {
