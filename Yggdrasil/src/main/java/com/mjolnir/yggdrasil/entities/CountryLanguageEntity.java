@@ -17,7 +17,6 @@ public class CountryLanguageEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @ColumnDefault("''")
     @JoinColumn(name = "CountryCode", nullable = false)
-    @JsonBackReference
     private CountryEntity countryEntityCode;
 
     @NotNull
@@ -39,11 +38,12 @@ public class CountryLanguageEntity {
         this.id = id;
     }
 
-    @JsonBackReference
+    @JsonBackReference(value = "countryCode")
     public CountryEntity getCountryCode() {
         return countryEntityCode;
     }
 
+    @JsonBackReference(value = "countryCode")
     public void setCountryCode(CountryEntity countryEntityCode) {
         this.countryEntityCode = countryEntityCode;
     }

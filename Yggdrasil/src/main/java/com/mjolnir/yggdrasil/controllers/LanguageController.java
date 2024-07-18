@@ -3,6 +3,7 @@ package com.mjolnir.yggdrasil.controllers;
 import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
+import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.service.WorldService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,17 +31,21 @@ public class LanguageController {
     @PostMapping
     public ResponseEntity<EntityModel<CountryLanguageEntity>> createLanguage(@RequestBody CountryLanguageEntity language, HttpServletRequest request) {
         try {
-            worldService.createNewCountryLanguage(language.getCountryCode().getCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
+            worldService.createNewCountryLanguage(language.getId().getCountryCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
         } catch (IllegalArgumentException e) {
-            throw new ResourceNotFoundException("Language not created: " + e.getMessage());
+            throw new InvalidBodyException("Language not created: " + e.getMessage());
         }
-        CountryLanguageEntity lang = getLanguageById(language.getCountryCode().getCode(), language.getLanguage()).getBody().getContent();
 
-        if (lang == null)
+        Optional<CountryLanguageEntity> lang = worldService.getLanguageById(language.getId().getCountryCode(), language.getLanguage());
+
+        if (lang.isEmpty())
             throw new ResourceNotFoundException("Language not created");
-        URI location = URI.create(request.getRequestURL().toString() + '/' + lang.getCountryCode() + '/' + lang.getLanguage());
-        return ResponseEntity.created(location).body((EntityModel.of(lang)));
+        else{
+            URI location = URI.create(request.getRequestURL().toString() + '/' + lang.get().getCountryCode().getCode() + '/' + lang.get().getLanguage());
+            return ResponseEntity.created(location).body(EntityModel.of(lang.get()));
+        }
     }
+
 
     @GetMapping("/{countryCode}/{language}")
     public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language) {
@@ -79,20 +84,21 @@ public class LanguageController {
     }
 
     @PutMapping("/{countryCode}/{language}")
-    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage) { CountryLanguageIdEntity primaryKey = new CountryLanguageIdEntity();
+    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage) {
+        CountryLanguageIdEntity primaryKey = new CountryLanguageIdEntity();
         primaryKey.setCountryCode(countryCode);
         primaryKey.setLanguage(language);
         boolean wasUpdateSuccessful = worldService.updateLanguageById(primaryKey, updatedLanguage);
 
-        if(wasUpdateSuccessful){
-            CountryLanguageEntity lang = getLanguageById(countryCode, language).getBody().getContent();
+        if (wasUpdateSuccessful) {
 
-            if (lang == null)
-                throw new ResourceNotFoundException("Language not updated");
+            Optional<CountryLanguageEntity> lang = worldService.getLanguageById(countryCode, language);
+
+            if (lang.isEmpty())
+                throw new InvalidBodyException("Language: " + countryCode + language + " not updated");
 
             return ResponseEntity.noContent().build();
-        }
-        else{
+        } else {
             throw new ResourceNotFoundException("Language not updated");
         }
     }
@@ -101,10 +107,10 @@ public class LanguageController {
     public ResponseEntity<Void> deleteLanguage(@PathVariable String countryCode, @PathVariable String language) {
         boolean wasDeleteSuccessful = worldService.deleteLanguageByCountryCodeAndLanguage(countryCode, language);
 
-        if(wasDeleteSuccessful){
+        if (wasDeleteSuccessful) {
             return ResponseEntity.noContent().build();
         }
 
-        throw new ResourceNotFoundException("Language not deleted");
+        throw new InvalidBodyException("Language: " + countryCode + language + " not deleted");
     }
 }
