@@ -24,7 +24,6 @@ public class CityEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @ColumnDefault("''")
     @JoinColumn(name = "CountryCode", nullable = false)
-    @JsonBackReference
     private CountryEntity countryEntityCode;
 
     @Size(max = 20)
