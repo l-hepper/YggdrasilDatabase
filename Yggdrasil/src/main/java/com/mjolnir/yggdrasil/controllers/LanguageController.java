@@ -6,6 +6,7 @@ import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
+import com.mjolnir.yggdrasil.utilities.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -56,14 +57,14 @@ public class LanguageController {
 
 
     @GetMapping("/{countryCode}/{language}")
-    public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language) {
+    public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language, HttpServletRequest request) {
         EntityModel<CountryLanguageEntity> languageEntity = worldService.getLanguageById(countryCode, language)
                 .map(lang -> {
-                    Link countryLink = Link.of("http://localhost:8080/Yggdrasil/countries/" + countryCode).withRel(countryCode);
+                    Link countryLink = Link.of(WebUtils.getRequestBaseUrl(request) + "/Yggdrasil/countries/" + countryCode).withRel(countryCode);
                     Link selfLink = WebMvcLinkBuilder.linkTo(
-                            methodOn(LanguageController.class).getLanguageById(lang.getCountryCode().getCode(), lang.getLanguage())).withSelfRel();
+                            methodOn(LanguageController.class).getLanguageById(lang.getCountryCode().getCode(), lang.getLanguage(), request)).withSelfRel();
                     Link relLink = WebMvcLinkBuilder.linkTo(
-                            methodOn(LanguageController.class).getAllLanguages()).withRel("languages");
+                            methodOn(LanguageController.class).getAllLanguages(request)).withRel("languages");
                     return EntityModel.of(lang, selfLink, relLink, countryLink);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Language not found"));
@@ -72,23 +73,23 @@ public class LanguageController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getAllLanguages() {
+    public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getAllLanguages(HttpServletRequest request) {
         List<CountryLanguageEntity> languages = worldService.getAllLanguages();
         List<EntityModel<CountryLanguageEntity>> resources = languages.stream()
                 .map(language -> {
                     String countryCode = language.getCountryCode().getCode();
-                    Link countryLink = Link.of("http://localhost:8080/Yggdrasil/countries/" + countryCode).withRel(countryCode);
+                    Link countryLink = Link.of(WebUtils.getRequestBaseUrl(request) + "/Yggdrasil/countries/" + countryCode).withRel(countryCode);
                     Link selfLink = WebMvcLinkBuilder.linkTo(
-                            methodOn(LanguageController.class).getLanguageById(language.getCountryCode().getCode(), language.getLanguage())).withSelfRel();
+                            methodOn(LanguageController.class).getLanguageById(language.getCountryCode().getCode(), language.getLanguage(), request)).withSelfRel();
                     Link relLink = WebMvcLinkBuilder.linkTo(
-                            methodOn(LanguageController.class).getAllLanguages()).withRel("languages");
+                            methodOn(LanguageController.class).getAllLanguages(request)).withRel("languages");
                     return EntityModel.of(language, selfLink, relLink, countryLink);
                 })
                 .toList();
 
         return ResponseEntity.ok(CollectionModel.of(
                 resources,
-                WebMvcLinkBuilder.linkTo(methodOn(LanguageController.class).getAllLanguages()).withSelfRel()));
+                WebMvcLinkBuilder.linkTo(methodOn(LanguageController.class).getAllLanguages(request)).withSelfRel()));
     }
 
     @PutMapping("/{countryCode}/{language}")
