@@ -2,8 +2,8 @@ package com.mjolnir.yggdrasil.controllers;
 
 import com.mjolnir.yggdrasil.dto.CityDTO;
 import com.mjolnir.yggdrasil.dto.CityDeletionResponseDTO;
+import com.mjolnir.yggdrasil.dto.DistrictDTO;
 import com.mjolnir.yggdrasil.entities.CityEntity;
-import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
@@ -11,25 +11,20 @@ import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.text.html.parser.Entity;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/Yggdrasil")
@@ -63,8 +58,8 @@ public class CityController {
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withSelfRel());
     }
 
-    @GetMapping("/cities/{id}")
-    public EntityModel<Optional<CityEntity>> getCityById(@PathVariable Integer id) {
+    @GetMapping("/cities/search/countryId")
+    public EntityModel<Optional<CityEntity>> getCityById(@RequestParam Integer id) {
         Optional<CityEntity> city = worldService.getCityOptionalById(id);
         if (city.isPresent()) {return EntityModel.of(city,
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(id)).withSelfRel(),
@@ -72,6 +67,167 @@ public class CityController {
         } else {
             throw new ResourceNotFoundException("City with id " + id + " not found");
         }
+    }
+
+    @GetMapping("/cities/search/countryCode")
+    public ResponseEntity<CollectionModel<EntityModel<CityEntity>>> searchCitiesByCountryCode(@RequestParam String code) {
+
+        if (code.length() != 3 || !code.matches("[A-Z]{3}")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country code must be exactly 3 uppercase letters.");
+        }
+        if (!worldService.isValidCountryCode(code)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid country code.");
+        }
+
+        List<CityEntity> cities = worldService.getCitiesByCountryCode(code);
+        //This check below may not need to be here.
+        if (cities.isEmpty()) {
+            throw new ResourceNotFoundException("No cities found for country code: " + code);
+        }
+
+        List<EntityModel<CityEntity>> cityModels = cities.stream()
+                .map(city -> EntityModel.of(city,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(city.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("cities")))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(
+                CollectionModel.of(cityModels,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withSelfRel())
+        );
+    }
+
+    @GetMapping("/cities/search/districts/largest")
+    public ResponseEntity<CollectionModel<EntityModel<DistrictDTO>>> findFiveLargestDistricts() {
+        List<Pair<String, Integer>> districts = worldService.findFiveLargestDistricts();
+
+        List<EntityModel<DistrictDTO>> districtModels = districts.stream()
+                .map(district -> {
+                    DistrictDTO dto = new DistrictDTO(district.getFirst(), district.getSecond());
+                    return EntityModel.of(dto,
+                            WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).findFiveLargestDistricts()).withSelfRel());
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<DistrictDTO>> collectionModel = CollectionModel.of(districtModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).findFiveLargestDistricts()).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+    @GetMapping("/cities/search/districts/smallest")
+    public ResponseEntity<CollectionModel<EntityModel<DistrictDTO>>> findFiveSmallestDistricts() {
+        List<Pair<String, Integer>> districts = worldService.findFiveSmallestDistricts();
+
+        List<EntityModel<DistrictDTO>> districtModels = districts.stream()
+                .map(pair -> {
+                    DistrictDTO dto = new DistrictDTO(pair.getFirst(), pair.getSecond());
+                    return EntityModel.of(dto,
+                            WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).findFiveSmallestDistricts()).withSelfRel(),
+                            WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(pair.getSecond())).withRel("city"));
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<DistrictDTO>> collectionModel = CollectionModel.of(districtModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).findFiveSmallestDistricts()).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+
+
+    @GetMapping("/cities/search/district")
+    public ResponseEntity<CollectionModel<EntityModel<CityEntity>>> getCitiesByDistrict(@RequestParam String districtName) {
+        List<CityEntity> cities = worldService.getCitiesByDistrict(districtName);
+
+        if (cities.isEmpty()) {
+            throw new ResourceNotFoundException("No cities found for district: " + districtName);
+        }
+
+        List<EntityModel<CityEntity>> cityModels = cities.stream()
+                .map(city -> EntityModel.of(city,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(city.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByDistrict(districtName)).withRel("district-cities"),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities")))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<CityEntity>> collectionModel = CollectionModel.of(cityModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByDistrict(districtName)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+    @GetMapping("/cities/search/populationBelow")
+    public ResponseEntity<CollectionModel<EntityModel<CityEntity>>> getCitiesByMaxPopulation(
+            @RequestParam("population") int maxPopulation) {
+
+        List<CityEntity> cities = worldService.getCitiesByMaxPopulation(maxPopulation);
+
+        if (cities.isEmpty()) {
+            throw new ResourceNotFoundException("No cities found with a population less than or equal to " + maxPopulation);
+        }
+
+        List<EntityModel<CityEntity>> cityModels = cities.stream()
+                .map(city -> EntityModel.of(city,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(city.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByMaxPopulation(maxPopulation)).withRel("by-max-population"),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities")))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<CityEntity>> collectionModel = CollectionModel.of(cityModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByMaxPopulation(maxPopulation)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+    @GetMapping("/cities/search/populationAbove")
+    public ResponseEntity<CollectionModel<EntityModel<CityEntity>>> getCitiesByMinPopulation(
+            @RequestParam("population") int minPopulation) {
+
+        List<CityEntity> cities = worldService.getCitiesByMinPopulation(minPopulation);
+
+        if (cities.isEmpty()) {
+            throw new ResourceNotFoundException("No cities found with a population greater than or equal to " + minPopulation);
+        }
+
+        List<EntityModel<CityEntity>> cityModels = cities.stream()
+                .map(city -> EntityModel.of(city,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(city.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByMinPopulation(minPopulation)).withRel("by-min-population"),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities")))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<CityEntity>> collectionModel = CollectionModel.of(cityModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByMinPopulation(minPopulation)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+    @GetMapping("/cities/search/name")
+    public ResponseEntity<CollectionModel<EntityModel<CityEntity>>> getCitiesByName(@RequestParam("cityName") String name) {
+        List<CityEntity> cities = worldService.getCitiesByName(name);
+
+        if (cities.isEmpty()) {
+            throw new ResourceNotFoundException("No cities found with the name: " + name);
+        }
+
+        List<EntityModel<CityEntity>> cityModels = cities.stream()
+                .map(city -> EntityModel.of(city,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCityById(city.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByName(name)).withRel("by-name"),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities")))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<CityEntity>> collectionModel = CollectionModel.of(cityModels,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getCitiesByName(name)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("all-cities"));
+
+        return ResponseEntity.ok(collectionModel);
     }
 
     @PostMapping("/cities")
