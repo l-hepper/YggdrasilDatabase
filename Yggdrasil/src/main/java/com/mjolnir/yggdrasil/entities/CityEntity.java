@@ -1,5 +1,6 @@
 package com.mjolnir.yggdrasil.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -52,6 +53,7 @@ public class CityEntity {
         this.name = name;
     }
 
+    @JsonBackReference
     public CountryEntity getCountryCode() {
         return countryEntityCode;
     }

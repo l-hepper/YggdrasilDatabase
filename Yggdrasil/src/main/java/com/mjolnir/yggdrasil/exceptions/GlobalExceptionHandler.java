@@ -41,5 +41,12 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("BAD_REQUEST", errors, request.getRequestURL().toString()));
     }
 
+    @ExceptionHandler(InvalidBodyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleInvalidBodyException(InvalidBodyException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("BAD_REQUEST", e.getMessage(), request.getRequestURL().toString()));
+    }
+
     private record ErrorResponse<T>(String error, T errorInfo, String url) {}
 }

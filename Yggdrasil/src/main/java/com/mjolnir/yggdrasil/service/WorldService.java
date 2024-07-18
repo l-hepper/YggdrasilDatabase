@@ -14,6 +14,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Optional;
@@ -164,7 +166,7 @@ public class WorldService {
         }
     }
 
-    public void createNewCountryLanguage(String countryCode, String language, String isOfficial, BigDecimal percentageSpoken) {
+    public void createNewCountryLanguage(String countryCode, String language, String isOfficial, BigDecimal percentageSpoken) throws IllegalArgumentException{
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
 
         if (countryEntityOptional.isPresent() && language != null && (Objects.equals(isOfficial, "F") || Objects.equals(isOfficial, "T")) && percentageSpoken.compareTo(BigDecimal.ZERO) > 0 && percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
@@ -184,19 +186,19 @@ public class WorldService {
 
         } else {
             if (countryEntityOptional.isEmpty()) {
-                logger.warning("Country with code " + countryCode + " does not exist.");
+                throw new IllegalArgumentException("Country with code " + countryCode + " does not exist.");
             }
             if (language == null) {
-                logger.warning("Language cannot be null.");
+                throw new IllegalArgumentException("Language cannot be null.");
             }
             if (percentageSpoken.compareTo(BigDecimal.ZERO) > 0) {
-                logger.warning("Percentage of spoken should be greater than zero.");
+                throw new IllegalArgumentException("Percentage of spoken should be greater than zero.");
             }
             if (percentageSpoken.compareTo(BigDecimal.valueOf(100)) <= 0) {
-                logger.warning("Percentage of spoken should be less than 100");
+                throw new IllegalArgumentException("Percentage of spoken should be less than 100");
             }
             if (isOfficial == null) {
-                logger.warning("isOfficial cannot be null.");
+                throw new IllegalArgumentException("isOfficial cannot be null.");
             }
         }
     }
@@ -329,11 +331,11 @@ public class WorldService {
         countryRepository.findAll().forEach(country -> country.getCountrylanguages().stream()
                 .filter(countryLanguage -> countryLanguage.getLanguage().equalsIgnoreCase(language))
                 .forEach(countryLanguage -> {
-                    if (countryLanguage.getIsOfficial().equals("T")) {
+                    //if (countryLanguage.getIsOfficial().equals("T")) {
                         countriesThatSpeakLanguage.add(country);
-                    }
+                    //}
                 }));
-        return countriesThatSpeakLanguage;
+        return List.copyOf(countriesThatSpeakLanguage);
     }
 
     // Update
@@ -591,5 +593,17 @@ public class WorldService {
         } else {
             throw new IllegalArgumentException("You cannot enter a negative population of: " + maxPopulation);
         }
+    }
+
+    public Optional<CountryLanguageEntity> getLanguageById(String countryCode, String language) {
+        CountryLanguageIdEntity primaryKey = new CountryLanguageIdEntity();
+        primaryKey.setCountryCode(countryCode);
+        primaryKey.setLanguage(language);
+
+        return countryLanguageRepository.findById(primaryKey);
+    }
+
+    public List<CountryLanguageEntity> getAllLanguages() {
+        return countryLanguageRepository.findAll();
     }
 }
