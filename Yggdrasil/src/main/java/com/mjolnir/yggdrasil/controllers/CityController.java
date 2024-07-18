@@ -1,6 +1,7 @@
 package com.mjolnir.yggdrasil.controllers;
 
 import com.mjolnir.yggdrasil.dto.CityDTO;
+import com.mjolnir.yggdrasil.dto.CityDeletionResponseDTO;
 import com.mjolnir.yggdrasil.entities.CityEntity;
 import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
@@ -91,17 +92,30 @@ public class CityController {
     }
 
     @DeleteMapping("/cities/{id}")
-    public ResponseEntity<EntityModel<CityEntity>> deleteCity(@PathVariable Integer id, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+    public ResponseEntity<EntityModel<CityDeletionResponseDTO>> deleteCity(@PathVariable Integer id, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
         String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
         if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        Optional<CityEntity> city = worldService.getCityOptionalById(id);
-        if (city.isPresent()) {
-            cityRepository.delete(city.get());
-            return ResponseEntity.noContent().build();
 
+        Optional<CityEntity> cityOptional = worldService.getCityOptionalById(id);
+
+        if (cityOptional.isPresent()) {
+            CityEntity cityEntity = cityOptional.get();
+            cityRepository.delete(cityOptional.get());
+
+            String message = String.format(
+                    "The city with ID: %d, named %s, located in the district of %s, with a population of %d has been successfully deleted.",
+                    cityEntity.getId(), cityEntity.getName(), cityEntity.getDistrict(), cityEntity.getPopulation()
+            );
+
+            CityDeletionResponseDTO response = new CityDeletionResponseDTO(message, cityOptional.get());
+
+            EntityModel<CityDeletionResponseDTO> entityModel = EntityModel.of(response,
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withRel("cities"));
+            return ResponseEntity.ok(entityModel);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "City with id " + id + " not found.");
         }
-        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("cities/{id}")
