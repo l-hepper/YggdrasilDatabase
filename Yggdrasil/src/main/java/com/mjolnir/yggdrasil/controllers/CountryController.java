@@ -129,7 +129,6 @@ public class CountryController {
                 default -> throw new ResourceNotFoundException("The field '" + key + "' is not valid.");
             }
         }
-
         CountryEntity updatedCountry = countryRepository.save(country);
         return ResponseEntity.ok(updatedCountry);
     }
