@@ -56,7 +56,12 @@ public class CountryController {
 
     @PostMapping
     public ResponseEntity<CountryEntity> createCountry(@RequestBody CountryEntity country) {
-        CountryEntity countryEntity = countryRepository.save(country);
+        CountryEntity countryEntity = null;
+        try {
+            countryEntity = countryRepository.save(country);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok(countryEntity);
     }
 
