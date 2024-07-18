@@ -1,5 +1,7 @@
 package com.mjolnir.yggdrasil.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -215,10 +217,12 @@ public class CountryEntity {
         return cities;
     }
 
+    @JsonBackReference(value = "country-cities")
     public void setCities(Set<CityEntity> cities) {
         this.cities = cities;
     }
 
+    @JsonBackReference(value = "country-languages")
     public Set<CountryLanguageEntity> getCountrylanguages() {
         return countryLanguageEntities;
     }
