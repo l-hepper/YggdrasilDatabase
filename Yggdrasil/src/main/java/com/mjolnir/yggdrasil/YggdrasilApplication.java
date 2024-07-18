@@ -3,9 +3,10 @@ package com.mjolnir.yggdrasil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.springframework.context.annotation.Bean;
+
 @SpringBootApplication
 public class YggdrasilApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(YggdrasilApplication.class, args);
     }
