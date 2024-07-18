@@ -124,9 +124,6 @@ public class CityController {
         if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
         String name = city.getName();
-        String district = city.getDistrict();
-        Integer population = city.getPopulation();
-        boolean isCapital = city.isCapital();
 
         Optional<CityEntity> cityOptional = worldService.getCityOptionalById(id);
         if (cityOptional.isEmpty()) {
