@@ -54,6 +54,7 @@ public class CityEntity {
         this.name = name;
     }
 
+    @JsonBackReference
     public CountryEntity getCountryCode() {
         return countryEntityCode;
     }

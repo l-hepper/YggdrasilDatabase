@@ -39,10 +39,12 @@ public class CountryLanguageEntity {
         this.id = id;
     }
 
+    @JsonBackReference(value = "countryCode")
     public CountryEntity getCountryCode() {
         return countryEntityCode;
     }
 
+    @JsonBackReference(value = "countryCode")
     public void setCountryCode(CountryEntity countryEntityCode) {
         this.countryEntityCode = countryEntityCode;
     }
