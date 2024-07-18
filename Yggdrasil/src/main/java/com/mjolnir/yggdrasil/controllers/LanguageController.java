@@ -1,6 +1,5 @@
 package com.mjolnir.yggdrasil.controllers;
 
-import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
@@ -11,8 +10,10 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.*;
@@ -30,6 +31,9 @@ public class LanguageController {
 
     @PostMapping
     public ResponseEntity<EntityModel<CountryLanguageEntity>> createLanguage(@RequestBody CountryLanguageEntity language, HttpServletRequest request) {
+        if(!request.getAttribute("role").equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+
         try {
             worldService.createNewCountryLanguage(language.getId().getCountryCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
         } catch (IllegalArgumentException e) {
@@ -84,7 +88,10 @@ public class LanguageController {
     }
 
     @PutMapping("/{countryCode}/{language}")
-    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage) {
+    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage, HttpServletRequest request) {
+        if(!request.getAttribute("role").equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+
         CountryLanguageIdEntity primaryKey = new CountryLanguageIdEntity();
         primaryKey.setCountryCode(countryCode);
         primaryKey.setLanguage(language);
@@ -104,7 +111,10 @@ public class LanguageController {
     }
 
     @DeleteMapping("/{countryCode}/{language}")
-    public ResponseEntity<Void> deleteLanguage(@PathVariable String countryCode, @PathVariable String language) {
+    public ResponseEntity<Void> deleteLanguage(@PathVariable String countryCode, @PathVariable String language, HttpServletRequest request) {
+        if(!request.getAttribute("role").equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+
         boolean wasDeleteSuccessful = worldService.deleteLanguageByCountryCodeAndLanguage(countryCode, language);
 
         if (wasDeleteSuccessful) {
