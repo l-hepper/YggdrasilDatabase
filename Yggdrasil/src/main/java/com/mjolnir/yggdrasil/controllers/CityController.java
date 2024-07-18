@@ -7,6 +7,7 @@ import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.text.html.parser.Entity;
 import java.net.URI;
@@ -35,13 +37,15 @@ public class CityController {
     private final CountryRepository countryRepository;
     private final CountryLanguageRepository countryLanguageRepository;
     private final WorldService worldService;
+    private final MjolnirApiService mjolnirApiService;
 
 
-    public CityController(CityRepository cityRepository, CountryRepository countryRepository, CountryLanguageRepository countryLanguageRepository, WorldService worldService, CityDTO cityDTO) {
+    public CityController(CityRepository cityRepository, CountryRepository countryRepository, CountryLanguageRepository countryLanguageRepository, WorldService worldService, CityDTO cityDTO, MjolnirApiService mjolnirApiService) {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.countryLanguageRepository = countryLanguageRepository;
         this.worldService = worldService;
+        this.mjolnirApiService = mjolnirApiService;
     }
 
     @GetMapping("/cities")
@@ -70,7 +74,11 @@ public class CityController {
     }
 
     @PostMapping("/cities")
-    public ResponseEntity<EntityModel<CityEntity>> createCity(@RequestBody CityDTO cityDTO, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<CityEntity>> createCity(@RequestBody CityDTO cityDTO, HttpServletRequest request, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
+
         String name = cityDTO.getName();
         String district = cityDTO.getDistrict();
         Integer population = cityDTO.getPopulation();
@@ -83,7 +91,10 @@ public class CityController {
     }
 
     @DeleteMapping("/cities/{id}")
-    public ResponseEntity<EntityModel<CityEntity>> deleteCity(@PathVariable Integer id) {
+    public ResponseEntity<EntityModel<CityEntity>> deleteCity(@PathVariable Integer id, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
         Optional<CityEntity> city = worldService.getCityOptionalById(id);
         if (city.isPresent()) {
             cityRepository.delete(city.get());
@@ -94,7 +105,10 @@ public class CityController {
     }
 
     @PatchMapping("cities/{id}")
-    public ResponseEntity<EntityModel<CityEntity>> updateCity(@PathVariable Integer id, @RequestBody CityDTO city, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<CityEntity>> updateCity(@PathVariable Integer id, @RequestBody CityDTO city, HttpServletRequest request, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
         String name = city.getName();
         String district = city.getDistrict();
         Integer population = city.getPopulation();
