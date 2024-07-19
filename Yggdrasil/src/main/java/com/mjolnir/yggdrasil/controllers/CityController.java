@@ -29,17 +29,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/Yggdrasil")
 public class CityController {
-    private final CityRepository cityRepository;
-    private final CountryRepository countryRepository;
-    private final CountryLanguageRepository countryLanguageRepository;
     private final WorldService worldService;
     private final MjolnirApiService mjolnirApiService;
 
 
     public CityController(CityRepository cityRepository, CountryRepository countryRepository, CountryLanguageRepository countryLanguageRepository, WorldService worldService, CityDTO cityDTO, MjolnirApiService mjolnirApiService) {
-        this.cityRepository = cityRepository;
-        this.countryRepository = countryRepository;
-        this.countryLanguageRepository = countryLanguageRepository;
         this.worldService = worldService;
         this.mjolnirApiService = mjolnirApiService;
     }
@@ -257,7 +251,7 @@ public class CityController {
 
         if (cityOptional.isPresent()) {
             CityEntity cityEntity = cityOptional.get();
-            cityRepository.delete(cityOptional.get());
+            worldService.deleteCityById(cityOptional.get().getId());
 
             String message = String.format(
                     "The city with ID: %d, named %s, located in the district of %s, with a population of %d has been successfully deleted.",
