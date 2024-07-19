@@ -72,6 +72,26 @@ public class LanguageController {
         return ResponseEntity.ok(languageEntity);
     }
 
+    @GetMapping("/{countryCode}")
+    public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getLanguageById(@PathVariable String countryCode, HttpServletRequest request) {
+        List<CountryLanguageEntity> languages = worldService.getLanguagesByCountryCode(countryCode);
+        List<EntityModel<CountryLanguageEntity>> resources = languages.stream()
+                .map(language -> {
+                    Link countriesLink = Link.of(WebUtils.getRequestBaseUrl(request) + "/Yggdrasil/countries").withRel("countries");
+                    Link selfLink = WebMvcLinkBuilder.linkTo(
+                            methodOn(LanguageController.class).getLanguageById(language.getCountryCode().getCode(), language.getLanguage(), request)).withSelfRel();
+                    Link relLink = WebMvcLinkBuilder.linkTo(
+                            methodOn(LanguageController.class).getAllLanguages(request)).withRel("languages");
+                    return EntityModel.of(language, selfLink, relLink, countriesLink);
+                })
+                .toList();
+
+
+        return ResponseEntity.ok(CollectionModel.of(
+                resources,
+                WebMvcLinkBuilder.linkTo(methodOn(LanguageController.class).getLanguageById(countryCode, request)).withSelfRel()));
+    }
+
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getAllLanguages(HttpServletRequest request) {
         List<CountryLanguageEntity> languages = worldService.getAllLanguages();
