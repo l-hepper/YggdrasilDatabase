@@ -58,7 +58,7 @@ public class CityController {
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CityController.class).getAllCities()).withSelfRel());
     }
 
-    @GetMapping("/cities/search/countryId")
+    @GetMapping("/cities/search/cityId")
     public EntityModel<Optional<CityEntity>> getCityById(@RequestParam Integer id) {
         Optional<CityEntity> city = worldService.getCityOptionalById(id);
         if (city.isPresent()) {return EntityModel.of(city,
