@@ -4,6 +4,7 @@ import com.mjolnir.yggdrasil.entities.CountryEntity;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
+import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/Yggdrasil/countries")
 public class CountryController {
 
+    private final MjolnirApiService mjolnirApiService;
     private final WorldService worldService;
     private final CountryRepository countryRepository;
 
     @Autowired
-    public CountryController(WorldService worldService, CountryRepository countryRepository) {
+    public CountryController(MjolnirApiService mjolnirApiService, WorldService worldService, CountryRepository countryRepository) {
+        this.mjolnirApiService = mjolnirApiService;
         this.worldService = worldService;
         this.countryRepository = countryRepository;
     }
@@ -57,11 +60,10 @@ public class CountryController {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<CountryEntity>> createCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
-
-        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+    public ResponseEntity<EntityModel<CountryEntity>> createCountry(@RequestBody CountryEntity country, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        }
 
         CountryEntity countryEntity = null;
         try {
@@ -93,11 +95,10 @@ public class CountryController {
     }
 
     @PutMapping
-    public ResponseEntity<EntityModel<CountryEntity>> updateCountry(@RequestBody CountryEntity country, HttpServletRequest request) {
-
-        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+    public ResponseEntity<EntityModel<CountryEntity>> updateCountry(@RequestBody CountryEntity country, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        }
 
         CountryEntity countryEntity = countryRepository.save(country);
         EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
@@ -107,11 +108,10 @@ public class CountryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id, HttpServletRequest request) {
-
-        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+    public ResponseEntity<HttpStatus> deleteCountry(@PathVariable String id, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        }
 
         boolean deleted = worldService.deleteCountryByCode(id);
         if (!deleted) {
@@ -122,12 +122,10 @@ public class CountryController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<CountryEntity>> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates, HttpServletRequest request) {
-
-        if(!request.getAttribute("role").equals("FULL_ACCESS")) {
+    public ResponseEntity<EntityModel<CountryEntity>> partialUpdateCountry(@PathVariable String id, @RequestBody Map<String, Object> updates, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
+        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
+        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-        }
-
         Optional<CountryEntity> optionalCountry = worldService.getCountryByCode(id);
         if (!optionalCountry.isPresent()) {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
