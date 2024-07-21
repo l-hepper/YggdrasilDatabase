@@ -129,25 +129,25 @@ public class WorldService {
             if (!continent.matches(CONTINENT_REGEX)) {
                 logger.warning("Continent '" + continent + "' does not match valid continents.");
             }
-            if (!(region.matches(REGION_REGEX) && region.length() < 26)) {
+            if (!region.matches(REGION_REGEX) || region.length() >= 26) {
                 logger.warning("Region '" + region + "' does not match valid regions or exceeds 26 characters.");
             }
-            if (!(surfaceArea.compareTo(BigDecimal.ZERO) > 0)) {
+            if (surfaceArea.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.warning("Surface area should be greater than zero.");
             }
-            if (!(independenceYear == null || independenceYear > 0)) {
+            if (independenceYear != null && independenceYear <= 0) {
                 logger.warning("Independence year should be null or greater than zero.");
             }
-            if (!(population == null || population > 0)) {
+            if (population != null && population <= 0) {
                 logger.warning("Population should be null or greater than zero.");
             }
-            if (!(lifeExpectancy == null || lifeExpectancy.compareTo(BigDecimal.ZERO) > 0)) {
+            if (lifeExpectancy != null && lifeExpectancy.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.warning("Life expectancy should be null or greater than zero.");
             }
-            if (!(GNP == null || GNP.compareTo(BigDecimal.ZERO) > 0)) {
+            if (GNP != null && GNP.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.warning("GNP should be null or greater than zero.");
             }
-            if (!(GNPOld == null || GNPOld.compareTo(BigDecimal.ZERO) > 0)) {
+            if (GNPOld != null && GNPOld.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.warning("GNPOld should be null or greater than zero.");
             }
             if (localName == null || localName.length() >= 45) {
@@ -156,13 +156,13 @@ public class WorldService {
             if (governmentForm == null) {
                 logger.warning("Government form is null.");
             }
-            if (!(headOfState == null || !headOfState.isEmpty())) {
+            if (headOfState == null || headOfState.isEmpty())  {
                 logger.warning("Head of state is null or empty.");
             }
-            if (!(countryCode2 != null && countryCode2.length() == 2)) {
+            if (countryCode2 == null || countryCode2.length() != 2) {
                 logger.warning("Country code2 should not be null and must be exactly 2 characters.");
             }
-            if (!(countryCode.length() == 3)) {
+            if (countryCode.length() != 3) {
                 logger.warning("Country code must be exactly 3 characters.");
             }
         }
