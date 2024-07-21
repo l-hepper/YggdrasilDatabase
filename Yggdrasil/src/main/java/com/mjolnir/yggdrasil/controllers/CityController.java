@@ -5,9 +5,6 @@ import com.mjolnir.yggdrasil.dto.CityDeletionResponseDTO;
 import com.mjolnir.yggdrasil.dto.DistrictDTO;
 import com.mjolnir.yggdrasil.entities.CityEntity;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
-import com.mjolnir.yggdrasil.repositories.CityRepository;
-import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
-import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +30,7 @@ public class CityController {
     private final MjolnirApiService mjolnirApiService;
 
 
-    public CityController(CityRepository cityRepository, CountryRepository countryRepository, CountryLanguageRepository countryLanguageRepository, WorldService worldService, CityDTO cityDTO, MjolnirApiService mjolnirApiService) {
+    public CityController(WorldService worldService, MjolnirApiService mjolnirApiService) {
         this.worldService = worldService;
         this.mjolnirApiService = mjolnirApiService;
     }
