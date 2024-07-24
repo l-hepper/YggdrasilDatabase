@@ -1,12 +1,18 @@
 package com.mjolnir.yggdrasil;
 
 import com.mjolnir.yggdrasil.entities.MjolnirApiKey;
+import com.mjolnir.yggdrasil.entities.User;
 import com.mjolnir.yggdrasil.repositories.MjolnirKeyRepository;
+import com.mjolnir.yggdrasil.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 public class YggdrasilApplication {
@@ -15,6 +21,18 @@ public class YggdrasilApplication {
     }
 
     // test
+//    @Bean
+//    CommandLineRunner runner(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+//        return args -> {
+//            Set<String> adminRoles = new HashSet<>();
+//            adminRoles.add("ROLE_ADMIN");
+//            userRepository.save(new User("admin", passwordEncoder.encode("password"), adminRoles));
+//
+//            Set<String> userRoles = new HashSet<>();
+//            userRoles.add("ROLE_USER");
+//            userRepository.save(new User("user", passwordEncoder.encode("password"), userRoles));
+//        };
+//    }
 
 //    @Bean
 //    CommandLineRunner loadData(MjolnirKeyRepository apiKeyRepository) {

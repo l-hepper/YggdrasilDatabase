@@ -2,6 +2,7 @@ package com.mjolnir.yggdrasil.entities;
 
 import jakarta.persistence.*;
 
+@Deprecated
 @Entity
 public class MjolnirApiKey {
     private static final String[] validRoles = {"READ_ONLY", "FULL_ACCESS"};

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Deprecated
 @Component
 public class MjolnirInterceptor implements HandlerInterceptor {
     private final MjolnirKeyRepository keyRepository;
