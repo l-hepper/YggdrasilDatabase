@@ -17,23 +17,23 @@ public class MjolnirInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-        String apiKey = request.getHeader("MJOlNIR-API-KEY");
-        if (apiKey == null) {
-            if ("GET".equals(request.getMethod())) {
-                return true; // Allow GET requests without an API key
-            } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return false;
-            }
-        }
-
-        MjolnirApiKey key = keyRepository.findByApiKey(apiKey);
-        if (key == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-
-        request.setAttribute("role", key.getRole());
-        return true;
+//        String apiKey = request.getHeader("MJOlNIR-API-KEY");
+//        if (apiKey == null) {
+//            if ("GET".equals(request.getMethod())) {
+//                return true; // Allow GET requests without an API key
+//            } else {
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                return false;
+//            }
+//        }
+//
+//        MjolnirApiKey key = keyRepository.findByApiKey(apiKey);
+//        if (key == null) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return false;
+//        }
+//
+//        request.setAttribute("role", key.getRole());
+        return true; // comment out to return true as I think we're replacing this with Spring Security - Liam
     }
 }
