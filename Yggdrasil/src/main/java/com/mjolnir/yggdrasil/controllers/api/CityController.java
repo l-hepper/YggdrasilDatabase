@@ -1,4 +1,4 @@
-package com.mjolnir.yggdrasil.controllers;
+package com.mjolnir.yggdrasil.controllers.api;
 
 import com.mjolnir.yggdrasil.dto.CityDTO;
 import com.mjolnir.yggdrasil.dto.CityDeletionResponseDTO;
