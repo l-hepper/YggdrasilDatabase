@@ -1,0 +1,30 @@
+.scrollable-table {
+    max-height: 60vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1.75rem);
+    margin: 0 auto;
+}
+.modal-content {
+    max-height: calc(100vh - 60px);
+    overflow: auto;
+}
