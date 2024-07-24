@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cities - Yggdrasil World Database</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{css/CitiesStyles.css}">
+</head>
+<body>
+<nav th:replace="~{fragments/navbar}"></nav>
+<div class="container mt-5">
+    <h1>Cities Management</h1>
+    <div class="mb-4">
+        <div class="btn-group" role="group" aria-label="CRUD actions">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#createCityModal">Create</button>
+            <a href="#" class="btn btn-secondary">Read</a>
+            <a href="#" class="btn btn-warning">Update</a>
+            <a href="#" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    <div class="scrollable-table">
+        <table class="table table-bordered table-striped header-fixed">
+            <thead class="thead-light sticky-top">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Country (Country Code)</th>
+                <th>District</th>
+                <th>Population</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="city : ${cities}">
+                <td th:text="${city.id}"></td>
+                <td th:text="${city.name}"></td>
+                <td th:text="${city.getCountryCode().getName()} + ' ' + '(' + ${city.getCountryCode().getCode()} + ')'"></td>
+                <td th:text="${city.district}"></td>
+                <td th:text="${city.population}"></td>
+                <td>
+                    <div class="button-group">
+                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/cities/update/' + ${city.id}}">Update</a>
+                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/cities/delete/' + ${city.id}}">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="createCityModal" tabindex="-1" role="dialog" aria-labelledby="createCityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCityModalLabel">Create New City</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form th:action="@{/cities/create}" method="post" th:object="${cityDTO}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="cityName">Name</label>
+                        <input type="text" class="form-control" id="cityName" name="name" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="countryCode">Country Code</label>
+                        <input type="text" class="form-control" id="countryCode" name="countryCode" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <input type="text" class="form-control" id="district" name="district" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="population">Population</label>
+                        <input type="number" class="form-control" id="population" name="population" required autocomplete="off">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isCapital" name="isCapital">
+                        <label class="form-check-label" for="isCapital">
+                            Is Capital
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
