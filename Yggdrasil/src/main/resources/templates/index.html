@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Yggdrasil World Database</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .info-box {
+            border: 1px solid #ddd;
+            border-radius: .25rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            background-color: #fff;
+            margin-bottom: 1rem;
+        }
+        .info-box h2 {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Yggdrasil World Database</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/countries}">Countries</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/cities}">Cities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/languages}">Languages</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <!-- <li class="nav-item"> -->
+            <!--     <a class="nav-link" th:href="@{/login}">Login</a> -->
+            <!-- </li> -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h1>Welcome to Yggdrasil World Database</h1>
+    <p>
+        Explore information about countries, cities, and languages from around the world.
+    </p>
+
+    <!-- Information Boxes -->
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="info-box">
+                <h2>Countries</h2>
+                <p>Explore information about various countries.</p>
+                <a class="btn btn-primary" href="#" th:href="@{/countries}">View Countries</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="info-box">
+                <h2>Cities</h2>
+                <p>Discover details about cities around the world.</p>
+                <a class="btn btn-primary" href="#" th:href="@{/cities}">View Cities</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="info-box">
+                <h2>Languages</h2>
+                <p>Learn about languages spoken in different regions.</p>
+                <a class="btn btn-primary" href="#" th:href="@{/languages}">View Languages</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
