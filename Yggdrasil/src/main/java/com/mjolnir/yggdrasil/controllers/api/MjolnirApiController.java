@@ -1,4 +1,4 @@
-package com.mjolnir.yggdrasil.controllers;
+package com.mjolnir.yggdrasil.controllers.api;
 
 import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-@Deprecated
 @RestController
 @RequestMapping("/Mjolnir/keygen")
 public class MjolnirApiController {
