@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest.requestMatchers("/", "/welcome").permitAll()
-                                .requestMatchers("/css/**", "/images/**").permitAll()
+                                .requestMatchers("/css/**", "/images/**", "/javascript/**").permitAll()
                                 .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
                                 .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
                                 .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
