@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest.requestMatchers("/", "/welcome").permitAll()
+                                .requestMatchers("/css/**", "/images/**").permitAll()
                                 .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
                                 .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
                                 .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
@@ -39,8 +40,15 @@ public class SecurityConfig {
                                 .requestMatchers("/cities/**").authenticated()
                                 .requestMatchers("/languages/**").authenticated()
                                 .requestMatchers("/Yggdrasil").authenticated())
-                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/Yggdrasil", true)
+                        .permitAll())
                 .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .build();
     }
+
+
+
+
 }
