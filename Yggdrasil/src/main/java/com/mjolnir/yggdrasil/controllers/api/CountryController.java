@@ -44,11 +44,26 @@ public class CountryController {
     }
 
     @GetMapping("/search")
-    public String searchCountries(@RequestParam(name = "countryCode", required = false) String countryCode, Model model) {
-        if (countryCode != null && !countryCode.isEmpty()) {
-            CountryEntity country = countryRepository.findById(countryCode).get();
-            System.out.println("Found Country: " + country.getCode());
-            model.addAttribute("country", country);
+    public String searchCountries(@RequestParam(required = false, defaultValue = "") String searchMethod,
+                                  @RequestParam(name = "countryCode", required = false) String countryCode,
+                                  @RequestParam(required = false, defaultValue = "") String name,
+                                  Model model) {
+
+        switch (searchMethod) {
+            case "id":
+                if (countryCode != null && !countryCode.isEmpty()) {
+                    CountryEntity country = countryRepository.findById(countryCode).get();
+                    System.out.println("Found Country: " + country.getCode());
+                    model.addAttribute("country", country);
+                }
+                break;
+            case "name":
+                if (name != null && !name.isEmpty()) {
+                    CountryEntity country = countryRepository.findCountryEntityByName(name).get();
+                    System.out.println("Found Country: " + country.getName());
+                    model.addAttribute("country", country);
+                }
+                break;
         }
 
         return "countries/searchResults"; // The name of the HTML template to display results
