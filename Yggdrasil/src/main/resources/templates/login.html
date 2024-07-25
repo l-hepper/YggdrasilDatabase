@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>Login - Yggdrasil World Database</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" th:href="@{css/LoginStyles.css}">
+    <link rel="stylesheet" th:href="@{/css/LoginStyles.css}">
 </head>
 <body>
 <div class="login-container">
-    <img th:src="@{/images/yggdrasil.png}" alt="Yggdrasil Logo">
+    <img th:src="@{images/yggdrasil.png}" alt="Yggdrasil Logo">
     <h2 class="mb-4">Yggdrasil World Database</h2>
     <form th:action="@{/login}" method="post" autocomplete="off">
         <div class="form-group">
