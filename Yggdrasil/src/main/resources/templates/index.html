@@ -17,6 +17,14 @@
         .info-box h2 {
             margin-bottom: 1rem;
         }
+        .photo-container {
+            height: 40vh;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=3272&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center;
+            background-size: cover;
+            border-radius: .25rem;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15)
+        }
+
     </style>
 </head>
 <body>
@@ -76,6 +84,12 @@
                 <p>Learn about languages spoken in different regions.</p>
                 <a class="btn btn-primary" href="#" th:href="@{/languages}">View Languages</a>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="photo-container"></div>
         </div>
     </div>
 </div>
