@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Cities - Yggdrasil World Database</title>
@@ -14,7 +14,7 @@
     <h1>Cities Management</h1>
     <div class="mb-4">
         <div class="btn-group" role="group" aria-label="CRUD actions">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#createCityModal">Create</button>
+            <button sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-primary" data-toggle="modal" data-target="#createCityModal">Create</button>
             <button class="btn btn-secondary" data-toggle="modal" data-target="#searchCityModal">Search</button>
 <!--            <button class="btn btn-warning" data-toggle="modal" data-target="#updateCityModal">Update</button>-->
 <!--            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCityModal">Delete</button>-->
@@ -29,7 +29,7 @@
                 <th>Country (Country Code)</th>
                 <th>District</th>
                 <th>Population</th>
-                <th>Actions</th>
+                <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -40,7 +40,7 @@
                 <td th:text="${city.district}"></td>
                 <td th:text="${city.population}"></td>
                 <td>
-                    <div class="button-group">
+                    <div sec:authorize="hasRole('ROLE_ADMIN')" class="button-group">
                         <button class="btn btn-warning btn-sm"
                                 data-toggle="modal"
                                 data-target="#updateCityModal"
