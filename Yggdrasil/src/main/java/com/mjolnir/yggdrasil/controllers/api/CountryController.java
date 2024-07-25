@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,14 +44,14 @@ public class CountryController {
     }
 
     @GetMapping("/search")
-    public String searchByCode(@RequestParam("code") String code, Model model) {
-        Optional<CountryEntity> country = worldService.getCountryByCode(code);
-        if (country.isPresent()) {
-            model.addAttribute("countriesList", List.of(country.get()));
-        } else {
-            model.addAttribute("message", "Country not found.");
+    public String searchCountries(@RequestParam(name = "countryCode", required = false) String countryCode, Model model) {
+        if (countryCode != null && !countryCode.isEmpty()) {
+            CountryEntity country = countryRepository.findById(countryCode).get();
+            System.out.println("Found Country: " + country.getCode());
+            model.addAttribute("country", country);
         }
-        return "countries_view";
+
+        return "countries/searchResults"; // The name of the HTML template to display results
     }
 
     // Method to render the update form with the country data
