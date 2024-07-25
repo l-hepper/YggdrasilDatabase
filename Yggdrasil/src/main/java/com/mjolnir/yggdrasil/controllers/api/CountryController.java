@@ -87,40 +87,34 @@ public class CountryController {
     }
 
 //
-//    @PostMapping
-//    public ResponseEntity<EntityModel<CountryEntity>> createCountry(@RequestBody CountryEntity country, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
-//        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
-//        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-//
-//        CountryEntity countryEntity = null;
-//        try {
-//            worldService.createNewCountry(
-//                    country.getCode(),
-//                    country.getName(),
-//                    country.getContinent(),
-//                    country.getRegion(),
-//                    country.getSurfaceArea(),
-//                    country.getIndepYear(),
-//                    country.getPopulation(),
-//                    country.getLifeExpectancy(),
-//                    country.getGnp(),
-//                    country.getGNPOld(),
-//                    country.getLocalName(),
-//                    country.getGovernmentForm(),
-//                    country.getHeadOfState(),
-//                    country.getCode2(),
-//                    true
-//            );
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
-////        resource.add(linkTo(methodOn(CountryController.class).getCountry(country.getCode())).withSelfRel());
-////        resource.add(linkTo(methodOn(CountryController.class).getCountries()).withRel("all-countries"));
-//        return new ResponseEntity<>(resource, HttpStatus.OK);
-//    }
+    @PostMapping("/create")
+    public String createCountry(@ModelAttribute CountryEntity country, Model model) {
+
+        CountryEntity countryEntity = null;
+        try {
+            worldService.createNewCountry(
+                    country.getCode(),
+                    country.getName(),
+                    country.getContinent(),
+                    country.getRegion(),
+                    country.getSurfaceArea(),
+                    country.getIndepYear(),
+                    country.getPopulation(),
+                    country.getLifeExpectancy(),
+                    country.getGnp(),
+                    country.getGNPOld(),
+                    country.getLocalName(),
+                    country.getGovernmentForm(),
+                    country.getHeadOfState(),
+                    country.getCode2(),
+                    true
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        model.addAttribute("countriesList", countryRepository.findAll());
+        return "countries_view";
+    }
 
 //        CountryEntity country = optionalCountry.get();
 
