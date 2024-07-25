@@ -7,12 +7,11 @@
     <link rel="stylesheet" th:href="@{/css/CitiesStyles.css}">
 </head>
 <body>
+
 <nav th:replace="~{fragments/navbar}"></nav>
 
-<!-- Search Form -->
-
 <div class="container-fluid mt-5">
-    <h1>Country Management</h1>
+    <h1>Countries Management</h1>
     <div class="mb-4">
         <div class="btn-group" role="group" aria-label="CRUD actions">
             <button class="btn btn-primary" data-toggle="modal" data-target="#createCountryModal">Create</button>
@@ -44,7 +43,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="country : ${countriesList}">
+            <tr th:each="country : ${country}">
                 <td th:text="${country.code}"></td>
                 <td th:text="${country.name}"></td>
                 <td th:text="${country.continent}"></td>
@@ -60,11 +59,10 @@
                 <td th:text="${country.headOfState}"></td>
                 <td th:text="${country.capital}"></td>
                 <td th:text="${country.code2}"></td>
-
                 <td>
                     <div class="button-group">
-                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/Yggdrasil/countries/update/' + ${country.code}}">Update</a>
-                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/Yggdrasil/countries/delete/' + ${country.code}}">Delete</a>
+                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/countries/update/' + ${country.code}}">Update</a>
+                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/countries/delete/' + ${country.code}}">Delete</a>
                     </div>
                 </td>
             </tr>
@@ -76,6 +74,7 @@
 <div th:replace="~{fragments/modals/create-country}"></div>
 
 <div th:replace="~{fragments/modals/search-country}"></div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -88,6 +87,5 @@
         document.getElementById('searchByGovernmentFormFields').classList.toggle('d-none', value !== 'governmentForm');
     }
 </script>
-
 </body>
 </html>

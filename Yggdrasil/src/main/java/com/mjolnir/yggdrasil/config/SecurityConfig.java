@@ -63,8 +63,6 @@ public class SecurityConfig {
 //
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        // use this to authorize everything - DEVELOPMENT ONLY
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,14 +40,49 @@ public class CountryController {
     }
 
     @GetMapping("/search")
-    public String searchByCode(@RequestParam("code") String code, Model model) {
-        Optional<CountryEntity> country = worldService.getCountryByCode(code);
-        if (country.isPresent()) {
-            model.addAttribute("countriesList", List.of(country.get()));
-        } else {
-            model.addAttribute("message", "Country not found.");
+    public String searchCountries(@RequestParam(required = false, defaultValue = "") String searchMethod,
+                                  @RequestParam(name = "countryCode", required = false) String countryCode,
+                                  @RequestParam(required = false, defaultValue = "") String name,
+                                  @RequestParam(required = false, defaultValue = "") String continent,
+                                  @RequestParam(required = false, defaultValue = "") String region,
+                                  @RequestParam(required = false, defaultValue = "") String governmentForm,
+                                  Model model) {
+
+        switch (searchMethod) {
+            case "id":
+                if (countryCode != null && !countryCode.isEmpty()) {
+                    CountryEntity country = countryRepository.findById(countryCode).get();
+                    System.out.println("Found Country: " + country.getCode());
+                    model.addAttribute("country", country);
+                }
+                break;
+            case "name":
+                if (name != null && !name.isEmpty()) {
+                    CountryEntity country = countryRepository.findCountryEntityByName(name).get();
+                    System.out.println("Found Country: " + country.getName());
+                    model.addAttribute("country", country);
+                }
+                break;
+            case "continent":
+                if (continent != null && !continent.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByContinent(continent);
+                    model.addAttribute("country", countries);
+                }
+                break;
+            case "region":
+                if (region != null && !region.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByRegion(region);
+                    model.addAttribute("country", countries);
+                }
+                break;
+            case "governmentForm":
+                if (governmentForm != null && !governmentForm.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByGovernmentForm(governmentForm);
+                    model.addAttribute("country", countries);
+                }
+                break;
         }
-        return "countries";
+        return "countries/searchResults";
     }
 
     // Method to render the update form with the country data
@@ -82,40 +119,34 @@ public class CountryController {
     }
 
 //
-//    @PostMapping
-//    public ResponseEntity<EntityModel<CountryEntity>> createCountry(@RequestBody CountryEntity country, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
-//        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
-//        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-//
-//        CountryEntity countryEntity = null;
-//        try {
-//            worldService.createNewCountry(
-//                    country.getCode(),
-//                    country.getName(),
-//                    country.getContinent(),
-//                    country.getRegion(),
-//                    country.getSurfaceArea(),
-//                    country.getIndepYear(),
-//                    country.getPopulation(),
-//                    country.getLifeExpectancy(),
-//                    country.getGnp(),
-//                    country.getGNPOld(),
-//                    country.getLocalName(),
-//                    country.getGovernmentForm(),
-//                    country.getHeadOfState(),
-//                    country.getCode2(),
-//                    true
-//            );
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        EntityModel<CountryEntity> resource = EntityModel.of(worldService.getCountryByCode(country.getCode()).get());
-////        resource.add(linkTo(methodOn(CountryController.class).getCountry(country.getCode())).withSelfRel());
-////        resource.add(linkTo(methodOn(CountryController.class).getCountries()).withRel("all-countries"));
-//        return new ResponseEntity<>(resource, HttpStatus.OK);
-//    }
+    @PostMapping("/create")
+    public String createCountry(@ModelAttribute CountryEntity country, Model model) {
+
+        CountryEntity countryEntity = null;
+        try {
+            worldService.createNewCountry(
+                    country.getCode(),
+                    country.getName(),
+                    country.getContinent(),
+                    country.getRegion(),
+                    country.getSurfaceArea(),
+                    country.getIndepYear(),
+                    country.getPopulation(),
+                    country.getLifeExpectancy(),
+                    country.getGnp(),
+                    country.getGNPOld(),
+                    country.getLocalName(),
+                    country.getGovernmentForm(),
+                    country.getHeadOfState(),
+                    country.getCode2(),
+                    true
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        model.addAttribute("countriesList", countryRepository.findAll());
+        return "countries_view";
+    }
 
 //        CountryEntity country = optionalCountry.get();
 
