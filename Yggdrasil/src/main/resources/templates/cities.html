@@ -172,8 +172,14 @@
                 contentType: 'application/json',
                 success: function (response) {
                     $('#updateCityModal').modal('hide');
-                    alert("City updated successfully");
-                    window.location.href = "/cities/search?searchMethod=id&cityId=" + cityId + "&name=&countryCode=&largestDistricts=&smallestDistricts=&district=&populationBelow=&populationAbove=";
+
+                    $('#updatedCityName').text(cityData.name);
+                    $('#updatedCityId').text(cityData.id);
+                    $('#updatedCountryCode').text(cityData.countryCode);
+                    $('#updatedDistrict').text(cityData.district);
+                    $('#updatedPopulation').text(cityData.population);
+
+                    $('#updateSuccessModal').modal('show');
                 },
                 error: function (xhr, status, error) {
                     alert('An error occurred while updating the city.');
@@ -181,7 +187,20 @@
                 }
             });
         });
+
+        // Handle button clicks in the success modal
+        $('#viewCityButton').on('click', function () {
+            let cityId = $('#updatedCityId').text();
+            window.location.href = "/cities/search?searchMethod=id&cityId=" + encodeURIComponent(cityId) + "&name=&countryCode=&largestDistricts=&smallestDistricts=&district=&populationBelow=&populationAbove=";
+        });
+
+        $('#viewAllCitiesButton').on('click', function () {
+            window.location.href = "/cities";
+        });
     });
+
+
+
 
 
 </script>
