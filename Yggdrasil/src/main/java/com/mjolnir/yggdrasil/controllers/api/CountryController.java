@@ -122,7 +122,7 @@ public class CountryController {
 //        return new ResponseEntity<>(resource, HttpStatus.OK);
 //    }
 
-        CountryEntity country = optionalCountry.get();
+//        CountryEntity country = optionalCountry.get();
 
 //
 
