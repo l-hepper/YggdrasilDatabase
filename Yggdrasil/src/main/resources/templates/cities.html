@@ -16,7 +16,7 @@
         <div class="btn-group" role="group" aria-label="CRUD actions">
             <button class="btn btn-primary" data-toggle="modal" data-target="#createCityModal">Create</button>
             <button class="btn btn-secondary" data-toggle="modal" data-target="#searchCityModal">Read</button>
-            <a href="#" class="btn btn-warning">Update</a>
+            <button class="btn btn-warning" data-toggle="modal" data-target="#updateCityModal">Update</button>
             <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCityModal">Delete</button>
         </div>
     </div>
@@ -41,7 +41,15 @@
                 <td th:text="${city.population}"></td>
                 <td>
                     <div class="button-group">
-                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/cities/update/' + ${city.id}}">Update</a>
+                        <button class="btn btn-warning btn-sm"
+                                data-toggle="modal"
+                                data-target="#updateCityModal"
+                                th:data-city-id="${city.id}"
+                                th:data-city-name="${city.name}"
+                                th:data-country-code="${city.getCountryCode().getCode()}"
+                                th:data-district="${city.district}"
+                                th:data-population="${city.population}">Update</button>
+
                         <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteCityActionModal" th:data-city-id="${city.id}" th:data-city-name="${city.name}">Delete</button>
                     </div>
                 </td>
@@ -55,6 +63,7 @@
 <div th:replace="~{fragments/modals/delete-city-action}"></div>
 <div th:replace="~{fragments/modals/search-city}"></div>
 <div th:replace="~{fragments/modals/delete-city-success}"></div>
+<div th:replace="~{fragments/modals/update-city}"></div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
@@ -110,5 +119,72 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function () {
+        $('#updateCityModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+
+            console.log("Button data attributes:");
+            console.log(button.data());
+
+            let cityId = button.data('city-id');
+            let cityName = button.data('city-name');
+            let countryCode = button.data('country-code');
+            let district = button.data('district');
+            let population = button.data('population');
+
+            let modal = $(this);
+            modal.find('#cityIdUpdate').val(cityId);
+            modal.find('#cityNameUpdate').val(cityName);
+            modal.find('#countryCodeUpdate').val(countryCode);
+            modal.find('#districtUpdate').val(district);
+            modal.find('#populationUpdate').val(population);
+
+            console.log("Modal field values:");
+            console.log("City ID: " + modal.find('#cityIdUpdate').val());
+            console.log("City Name: " + modal.find('#cityNameUpdate').val());
+            console.log("Country Code: " + modal.find('#countryCodeUpdate').val());
+            console.log("District: " + modal.find('#districtUpdate').val());
+            console.log("Population: " + modal.find('#populationUpdate').val());
+        });
+
+        $('#updateCityForm').on('submit', function (e) {
+            e.preventDefault();
+
+            let cityId = $('#cityIdUpdate').val();
+            let cityName = $('#cityNameUpdate').val();
+            let countryCode = $('#countryCodeUpdate').val();
+            let district = $('#districtUpdate').val();
+            let population = $('#populationUpdate').val();
+
+            let cityData = {
+                id: cityId,
+                name: cityName,
+                countryCode: countryCode,
+                district: district,
+                population: population
+            };
+
+            $.ajax({
+                url: '/cities/update/' + encodeURIComponent(cityId),
+                type: 'PATCH',
+                data: JSON.stringify(cityData),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updateCityModal').modal('hide');
+                    alert("City updated successfully");
+                    window.location.href = "/cities/search?searchMethod=id&cityId=" + cityId + "&name=&countryCode=&largestDistricts=&smallestDistricts=&district=&populationBelow=&populationAbove=";
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred while updating the city.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+
+</script>
+
 </body>
 </html>
