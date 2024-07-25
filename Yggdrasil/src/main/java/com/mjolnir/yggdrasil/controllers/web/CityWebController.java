@@ -9,10 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class CityWebController {
@@ -156,7 +153,17 @@ public class CityWebController {
         }
     }
 
+    @PatchMapping("/cities/update/{id}")
+    @ResponseBody
+    public Map<String, String> updateCity(@PathVariable("id") int id, @RequestBody CityDTO cityDTO) {
+        worldService.updateCityById(id, cityDTO);
 
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("redirectUrl", "/cities/search?searchMethod=id&cityId=" + id + "&name=&countryCode=&largestDistricts=&smallestDistricts=&district=&populationBelow=&populationAbove=");
+
+        return response;
+    }
 
 
 
