@@ -55,5 +55,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("BAD_REQUEST", e.getMessage(), request.getRequestURL().toString()));
     }
 
+
+    @ExceptionHandler(UpdateFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleUpdateFailedException(UpdateFailedException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("BAD_REQUEST", e.getMessage(), request.getRequestURL().toString()));
+    }
+
     private record ErrorResponse<T>(String error, T errorInfo, String url) {}
 }
