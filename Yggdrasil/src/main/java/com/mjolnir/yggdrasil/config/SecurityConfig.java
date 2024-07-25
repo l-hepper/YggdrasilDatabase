@@ -30,28 +30,28 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 //         use this to authorize everything - DEVELOPMENT ONLY
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authRequest ->
-                        authRequest.anyRequest().permitAll())
-                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
-                .logout(logout -> logout.logoutUrl("/logout").permitAll())
-                .build();
-
-
 //        return http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests(authRequest ->
-//                        authRequest.requestMatchers("/", "/welcome").permitAll()
-//                                .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
-//                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
-//                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
-//                                .requestMatchers("/countries/**").authenticated()
-//                                .requestMatchers("/cities/**").authenticated()
-//                                .requestMatchers("/languages/**").authenticated()
-//                                .requestMatchers("/Yggdrasil").authenticated())
+//                        authRequest.anyRequest().permitAll())
 //                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
 //                .logout(logout -> logout.logoutUrl("/logout").permitAll())
 //                .build();
+
+
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authRequest ->
+                        authRequest.requestMatchers("/", "/welcome").permitAll()
+                                .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
+                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
+                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
+                                .requestMatchers("/countries/**").authenticated()
+                                .requestMatchers("/cities/**").authenticated()
+                                .requestMatchers("/languages/**").authenticated()
+                                .requestMatchers("/Yggdrasil").authenticated())
+                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+                .logout(logout -> logout.logoutUrl("/logout").permitAll())
+                .build();
     }
 }
