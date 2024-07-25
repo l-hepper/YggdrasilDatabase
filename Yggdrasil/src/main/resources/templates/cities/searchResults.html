@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cities - Yggdrasil World Database</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/CitiesStyles.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navbar}"></nav>
+
+<div class="container mt-5">
+    <h1>Cities Management</h1>
+    <div class="mb-4">
+        <div class="btn-group" role="group" aria-label="CRUD actions">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#createCityModal">Create</button>
+            <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#searchCityModal">Read</a>
+            <a href="#" class="btn btn-warning">Update</a>
+            <a href="#" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    <div class="scrollable-table">
+        <table class="table table-bordered table-striped header-fixed">
+            <thead class="thead-light sticky-top">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Country (Country Code)</th>
+                <th>District</th>
+                <th>Population</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="city : ${cities}">
+                <td th:text="${city.id}"></td>
+                <td th:text="${city.name}"></td>
+                <td th:text="${city.getCountryCode().getName()} + ' ' + '(' + ${city.getCountryCode().getCode()} + ')'"></td>
+                <td th:text="${city.district}"></td>
+                <td th:text="${city.population}"></td>
+                <td>
+                    <div class="button-group">
+                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/cities/update/' + ${city.id}}">Update</a>
+                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/cities/delete/' + ${city.id}}">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/modals/create-city}"></div>
+
+<div th:replace="~{fragments/modals/search-city}"></div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function toggleFields(value) {
+        document.getElementById('searchByIdFields').classList.toggle('d-none', value !== 'id');
+        document.getElementById('searchByNameFields').classList.toggle('d-none', value !== 'name');
+        document.getElementById('searchByCountryCodeFields').classList.toggle('d-none', value !== 'countryCode');
+        document.getElementById('largestDistrictsFields').classList.toggle('d-none', value !== 'largestDistricts');
+        document.getElementById('smallestDistrictsFields').classList.toggle('d-none', value !== 'smallestDistricts');
+        document.getElementById('byDistrictFields').classList.toggle('d-none', value !== 'byDistrict');
+        document.getElementById('populationBelowFields').classList.toggle('d-none', value !== 'populationBelow');
+        document.getElementById('populationAboveFields').classList.toggle('d-none', value !== 'populationAbove');
+    }
+</script>
+
+</body>
+</html>

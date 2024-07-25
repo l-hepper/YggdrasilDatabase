@@ -1,0 +1,89 @@
+<div class="modal fade" id="searchCityModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Search Cities</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/cities/search}" method="get">
+                    <div class="mb-3">
+                        <label for="searchMethod" class="form-label">Select Search Method</label>
+                        <select id="searchMethod" name="searchMethod" class="form-select" onchange="toggleFields(this.value)">
+                            <option value="" disabled selected>Select a method</option>
+                            <option value="id">Search by ID</option>
+                            <option value="name">Search by Name</option>
+                            <option value="countryCode">Search by Country Code</option>
+                            <option value="largestDistricts">Largest Districts</option>
+                            <option value="smallestDistricts">Smallest Districts</option>
+                            <option value="byDistrict">By District</option>
+                            <option value="populationBelow">Population Below</option>
+                            <option value="populationAbove">Population Above</option>
+                        </select>
+                    </div>
+
+                    <div id="searchByIdFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="id" class="form-label">City ID</label>
+                            <input type="text" id="id" name="cityId" class="form-control" placeholder="Enter City ID">
+                        </div>
+                    </div>
+
+
+                    <div id="searchByNameFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">City Name</label>
+                            <input type="text" id="name" name="name" class="form-control">
+                        </div>
+                    </div>
+
+
+                    <div id="searchByCountryCodeFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="countryCode" class="form-label">Country Code</label>
+                            <input type="text" id="countryCode" name="countryCode" class="form-control">
+                        </div>
+                    </div>
+
+                    <div id="largestDistrictsFields" class="d-none">
+                        <input type="hidden" name="largestDistricts">
+                        <p class="form-text">Get the 5 largest districts.</p>
+                    </div>
+
+                    <div id="smallestDistrictsFields" class="d-none">
+                        <input type="hidden" name="smallestDistricts">
+                        <p class="form-text">Get the 5 smallest districts.</p>
+                    </div>
+
+                    <div id="byDistrictFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="district" class="form-label">District</label>
+                            <input type="text" id="district" name="district" class="form-control">
+                        </div>
+                    </div>
+
+                    <div id="populationBelowFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="populationBelow" class="form-label">Population Below</label>
+                            <input type="number" id="populationBelow" name="populationBelow" class="form-control" min="0">
+                        </div>
+                    </div>
+
+                    <div id="populationAboveFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="populationAbove" class="form-label">Population Above</label>
+                            <input type="number" id="populationAbove" name="populationAbove" class="form-control" min="0">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

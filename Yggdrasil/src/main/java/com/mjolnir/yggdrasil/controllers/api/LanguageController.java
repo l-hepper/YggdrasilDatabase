@@ -1,4 +1,4 @@
-package com.mjolnir.yggdrasil.controllers;
+package com.mjolnir.yggdrasil.controllers.api;
 
 import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
