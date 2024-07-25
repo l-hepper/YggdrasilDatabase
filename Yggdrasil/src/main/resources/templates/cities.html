@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Cities - Yggdrasil World Database</title>
@@ -29,7 +29,7 @@
                 <th>Country (Country Code)</th>
                 <th>District</th>
                 <th>Population</th>
-                <th>Actions</th>
+                <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -40,7 +40,7 @@
                 <td th:text="${city.district}"></td>
                 <td th:text="${city.population}"></td>
                 <td>
-                    <div class="button-group">
+                    <div sec:authorize="hasRole('ROLE_ADMIN')" class="button-group">
                         <button class="btn btn-warning btn-sm"
                                 data-toggle="modal"
                                 data-target="#updateCityModal"
