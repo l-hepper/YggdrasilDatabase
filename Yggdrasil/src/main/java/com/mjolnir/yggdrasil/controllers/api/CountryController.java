@@ -8,17 +8,12 @@ import com.mjolnir.yggdrasil.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
 @RequestMapping("/Yggdrasil/countries")
@@ -39,7 +34,7 @@ public class CountryController {
     public String getCountries(Model model) {
         List<CountryEntity> countriesList = countryRepository.findAll();
         model.addAttribute("countriesList", countriesList);
-        return "countries_view";
+        return "/countries";
     }
 
     @GetMapping("/search")
@@ -50,7 +45,7 @@ public class CountryController {
         } else {
             model.addAttribute("message", "Country not found.");
         }
-        return "countries_view";
+        return "countries";
     }
 
     // Method to render the update form with the country data
@@ -62,7 +57,7 @@ public class CountryController {
         } else {
             model.addAttribute("message", "Country not found.");
         }
-        return "countries_view";
+        return "countries";
     }
 
     @PostMapping("/update")
@@ -73,7 +68,7 @@ public class CountryController {
         List<CountryEntity> countriesList = worldService.getAllCountries();
         model.addAttribute("countriesList", countriesList);
 
-        return "countries_view";
+        return "countries";
     }
 
     @PostMapping("/delete/{id}")
@@ -83,7 +78,7 @@ public class CountryController {
             throw new ResourceNotFoundException("Country with id " + id + " not found");
         }
 
-        return "countries_view";
+        return "countries";
     }
 
 //
