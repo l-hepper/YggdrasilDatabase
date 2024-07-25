@@ -87,7 +87,6 @@ public class CountryController {
         return "countries/searchResults";
     }
 
-    // Method to render the update form with the country data
     @GetMapping("/edit/{code}")
     public String editCountry(@PathVariable String code, Model model) {
         Optional<CountryEntity> country = worldService.getCountryByCode(code);
@@ -96,17 +95,6 @@ public class CountryController {
         } else {
             model.addAttribute("message", "Country not found.");
         }
-        return "countries";
-    }
-
-    @PostMapping("/update")
-    public String updateCountry(@ModelAttribute CountryEntity updatedCountry, Model model) {
-
-        worldService.updateCountryById(updatedCountry.getCode(), updatedCountry);
-
-        List<CountryEntity> countriesList = worldService.getAllCountries();
-        model.addAttribute("countriesList", countriesList);
-
         return "countries";
     }
 
@@ -122,7 +110,7 @@ public class CountryController {
     }
 
     @PostMapping("/update/{countryCode}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String updateCountry(@PathVariable String countryCode, @RequestBody Map<String, Object> updates, Model model) {
         Optional<CountryEntity> toUpdate = worldService.getCountryByCode(countryCode);
 
