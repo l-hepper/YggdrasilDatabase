@@ -28,6 +28,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+//         use this to authorize everything - DEVELOPMENT ONLY
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(authRequest ->
+//                        authRequest.anyRequest().permitAll())
+//                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+//                .logout(logout -> logout.logoutUrl("/logout").permitAll())
+//                .build();
+
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
