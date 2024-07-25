@@ -49,6 +49,7 @@ public class CountryController {
                                   @RequestParam(required = false, defaultValue = "") String name,
                                   @RequestParam(required = false, defaultValue = "") String continent,
                                   @RequestParam(required = false, defaultValue = "") String region,
+                                  @RequestParam(required = false, defaultValue = "") String governmentForm,
                                   Model model) {
 
         switch (searchMethod) {
@@ -75,6 +76,12 @@ public class CountryController {
             case "region":
                 if (region != null && !region.isEmpty()) {
                     List<CountryEntity> countries = countryRepository.findCountryEntitiesByRegion(region);
+                    model.addAttribute("country", countries);
+                }
+                break;
+            case "governmentForm":
+                if (governmentForm != null && !governmentForm.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByGovernmentForm(governmentForm);
                     model.addAttribute("country", countries);
                 }
                 break;

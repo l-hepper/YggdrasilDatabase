@@ -17,4 +17,5 @@ public interface CountryRepository extends JpaRepository<CountryEntity, String> 
     List<CountryEntity> findCountryEntitiesByContinent(String continent);
     List<CountryEntity> findCountryEntitiesByRegion(String region);
     List<CountryEntity> findCountryEntitiesByPopulationBetween(Integer start, Integer end);
+    List<CountryEntity> findCountryEntitiesByGovernmentForm(String governmentForm);
 }
