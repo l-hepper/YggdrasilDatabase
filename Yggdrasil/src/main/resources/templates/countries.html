@@ -114,5 +114,119 @@
         }
     }
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('updateCountryModal').addEventListener('submit', function (event) {
+            event.preventDefault();
+            patchCountry();
+        });
+    });
+
+
+    function openUpdateModal(element) {
+        if (element) {
+            // Extract data attributes from the clicked element
+            var countryCode = element.getAttribute('data-country-code');
+            var name = element.getAttribute('data-name');
+            var continent = element.getAttribute('data-continent');
+            var region = element.getAttribute('data-region');
+            var surfaceArea = element.getAttribute('data-surface-area');
+            var indepYear = element.getAttribute('data-indep-year');
+            var population = element.getAttribute('data-population');
+            var lifeExpectancy = element.getAttribute('data-life-expectancy');
+            var gnp = element.getAttribute('data-gnp');
+            var gnpOld = element.getAttribute('data-gnp-old');
+            var localName = element.getAttribute('data-local-name');
+            var governmentForm = element.getAttribute('data-government-form');
+            var headOfState = element.getAttribute('data-head-of-state');
+            var code2 = element.getAttribute('data-code2');
+
+            // Set the form values in the update modal
+            document.querySelector('#updateCountryModal #code').value = countryCode;
+            document.querySelector('#updateCountryModal #name').value = name;
+            document.querySelector('#updateCountryModal #continent').value = continent;
+            document.querySelector('#updateCountryModal #region').value = region;
+            document.querySelector('#updateCountryModal #surfaceArea').value = surfaceArea;
+            document.querySelector('#updateCountryModal #indepYear').value = indepYear;
+            document.querySelector('#updateCountryModal #population').value = population;
+            document.querySelector('#updateCountryModal #lifeExpectancy').value = lifeExpectancy;
+            document.querySelector('#updateCountryModal #gnp').value = gnp;
+            document.querySelector('#updateCountryModal #gnpOld').value = gnpOld;
+            document.querySelector('#updateCountryModal #localName').value = localName;
+            document.querySelector('#updateCountryModal #governmentForm').value = governmentForm;
+            document.querySelector('#updateCountryModal #headOfState').value = headOfState;
+            document.querySelector('#updateCountryModal #code2').value = code2;
+        }
+
+        // Show the modal
+        $('#updateCountryModal').modal('show');
+    }
+
+    function patchCountry() {
+        // Extract values from the form fields in the update modal
+        var countryCode = document.querySelector('#updateCountryModal #code').value;
+        var name = document.querySelector('#updateCountryModal #name').value;
+        var continent = document.querySelector('#updateCountryModal #continent').value;
+        var region = document.querySelector('#updateCountryModal #region').value;
+        var surfaceArea = document.querySelector('#updateCountryModal #surfaceArea').value;
+        var indepYear = document.querySelector('#updateCountryModal #indepYear').value;
+        var population = document.querySelector('#updateCountryModal #population').value;
+        var lifeExpectancy = document.querySelector('#updateCountryModal #lifeExpectancy').value;
+        var gnp = document.querySelector('#updateCountryModal #gnp').value;
+        var gnpOld = document.querySelector('#updateCountryModal #gnpOld').value;
+        var localName = document.querySelector('#updateCountryModal #localName').value;
+        var governmentForm = document.querySelector('#updateCountryModal #governmentForm').value;
+        var headOfState = document.querySelector('#updateCountryModal #headOfState').value;
+        var code2 = document.querySelector('#updateCountryModal #code2').value;
+
+        // Validate and prepare the data
+        var updateData = {
+            name: name,
+            continent: continent,
+            region: region,
+            surfaceArea: parseFloat(surfaceArea),
+            indepYear: parseInt(indepYear),
+            population: parseInt(population),
+            lifeExpectancy: parseFloat(lifeExpectancy),
+            gnp: parseFloat(gnp),
+            gnpOld: parseFloat(gnpOld),
+            localName: localName,
+            governmentForm: governmentForm,
+            headOfState: headOfState,
+            code2: code2
+        };
+
+        // Validate numeric fields
+        if (isNaN(updateData.surfaceArea) || updateData.surfaceArea < 0 ||
+            isNaN(updateData.indepYear) || updateData.indepYear < 0 ||
+            isNaN(updateData.population) || updateData.population < 0 ||
+            isNaN(updateData.lifeExpectancy) || updateData.lifeExpectancy < 0 ||
+            isNaN(updateData.gnp) || updateData.gnp < 0 ||
+            isNaN(updateData.gnpOld) || updateData.gnpOld < 0) {
+            alert('Please provide valid numeric values.');
+            return;
+        }
+
+        // Make the PATCH request
+        fetch(`/Yggdrasil/countries/update/${encodeURIComponent(countryCode)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Country updated successfully.');
+                    location.reload();
+                } else {
+                    alert('Failed to update country.');
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+</script>
 </body>
 </html>
