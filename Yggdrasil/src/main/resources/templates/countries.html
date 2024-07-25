@@ -63,7 +63,15 @@
 
                 <td>
                     <div class="button-group">
-                        <a href="#" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#updateCountryModal">Update</a>
+                        <a href="#" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#updateCountryModal"
+                           data-country-code="US" data-name="United States" data-continent="North America"
+                           data-region="North America" data-surface-area="9833517" data-indep-year="1776"
+                           data-population="331002651" data-life-expectancy="78.9" data-gnp="21427700"
+                           data-gnp-old="20580000" data-local-name="United States of America"
+                           data-government-form="Federal Republic" data-head-of-state="President" data-code2="US"
+                           onclick="openUpdateModal(this)">
+                            Update
+                        </a>
                         <a href="#" class="btn btn-danger btn-sm"
                            th:attr="data-country-code=${country.getCode()}"
                            onclick="deleteCountry(this)">Delete</a>
