@@ -26,38 +26,49 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-//        use this to authorize everything - DEVELOPMENT ONLY
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        return http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests(authRequest ->
-//                        authRequest.anyRequest().permitAll())
-//                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+//                        //All
+//                        authRequest.requestMatchers("/", "/welcome").permitAll()
+//                                .requestMatchers("/css/**", "/images/**").permitAll()
+//                                //Countries
+//                                .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
+//                                .requestMatchers("/Yggdrasil/countries", "/Yggdrasil/countries/search").authenticated()
+//
+//                                //Cities
+//                                .requestMatchers("/cities/**").authenticated()
+//                                .requestMatchers("/cities/id/**").authenticated()
+//                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
+//                                .requestMatchers("/cities/**").hasRole("ADMIN")
+//
+//                                //Languages
+//                                .requestMatchers("/languages/**").authenticated()
+//                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
+//
+//
+//                                .requestMatchers("/").authenticated()
+//                                .requestMatchers("/Yggdrasil").authenticated())
+//
+//
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/Yggdrasil", true)
+//                        .permitAll())
 //                .logout(logout -> logout.logoutUrl("/logout").permitAll())
 //                .build();
 //    }
-
-
+//
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
-                        authRequest.requestMatchers("/", "/welcome").permitAll()
-                                .requestMatchers("/css/**", "/images/**").permitAll()
-                                .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
-                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
-                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
-                                .requestMatchers("/").authenticated()
-                                .requestMatchers("/Yggdrasil/countries", "/Yggdrasil/countries/search").authenticated()
-                                .requestMatchers("/cities/**").authenticated()
-                                .requestMatchers("/languages/**").authenticated()
-                                .requestMatchers("/Yggdrasil").authenticated())
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/Yggdrasil", true)
-                        .permitAll())
+                        authRequest.anyRequest().permitAll())
+                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
                 .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .build();
-        }
     }
+}

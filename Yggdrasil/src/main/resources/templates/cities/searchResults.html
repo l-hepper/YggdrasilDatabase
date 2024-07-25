@@ -42,7 +42,7 @@
                 <td>
                     <div class="button-group">
                         <a href="#" class="btn btn-warning btn-sm" th:href="@{'/cities/update/' + ${city.id}}">Update</a>
-                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/cities/delete/' + ${city.id}}">Delete</a>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteCityActionModal" th:data-city-id="${city.id}" th:data-city-name="${city.name}">Delete</button>
                     </div>
                 </td>
             </tr>
@@ -52,10 +52,11 @@
 </div>
 
 <div th:replace="~{fragments/modals/create-city}"></div>
-
+<div th:replace="~{fragments/modals/delete-city-action}"></div>
 <div th:replace="~{fragments/modals/search-city}"></div>
+<div th:replace="~{fragments/modals/delete-city-success}"></div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
@@ -70,6 +71,44 @@
         document.getElementById('populationAboveFields').classList.toggle('d-none', value !== 'populationAbove');
     }
 </script>
+<script>
+    $(document).ready(function () {
+        let $successModal = $('#successModal');
 
+        $('#deleteCityActionModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget);
+            let cityId = button.data('city-id');
+            let cityName = button.data('city-name');
+
+            let modal = $(this);
+            modal.find('#confirmDeleteButton').data('city-id', cityId);
+            modal.find('#confirmDeleteButton').data('city-name', cityName);
+        });
+
+        $('#confirmDeleteButton').on('click', function () {
+            let cityId = $(this).data('city-id');
+            let cityName = $(this).data('city-name');
+            if (cityId) {
+                $.ajax({
+                    url: '/cities/delete/' + encodeURIComponent(cityId),
+                    type: 'DELETE',
+                    success: function (result) {
+                        $('#deleteCityActionModal').modal('hide');
+                        $successModal.find('#cityName').text(cityName);
+                        $successModal.find('#cityId').text(cityId);
+                        $successModal.modal('show');
+                        $successModal.on('hidden.bs.modal', function () {
+                            window.location.href = '/cities';
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert('An error occurred while deleting the city.');
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>
