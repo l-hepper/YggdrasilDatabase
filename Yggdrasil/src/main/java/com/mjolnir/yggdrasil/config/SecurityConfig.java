@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,16 +29,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest.requestMatchers("/", "/welcome").permitAll()
-                                .requestMatchers("/countries/**").hasRole("ADMIN")
-                                .requestMatchers("/cities/**").hasRole("ADMIN")
-                                .requestMatchers("/languages/**").hasRole("ADMIN")
-                                .requestMatchers("/countries").hasAnyRole("ADMIN", "USER")
-                                .requestMatchers("/cities").hasAnyRole("ADMIN", "USER")
-                                .requestMatchers("/languages").hasAnyRole("ADMIN", "USER")
-                                .anyRequest().authenticated())
+                                .requestMatchers("/Yggdrasil/countries/create", "/Yggdrasil/countries/**/edit", "/Yggdrasil/countries/**/delete").hasRole("ADMIN")
+                                .requestMatchers("/Yggdrasil/cities/create", "/Yggdrasil/cities/**/edit", "/Yggdrasil/cities/**/delete").hasRole("ADMIN")
+                                .requestMatchers("/Yggdrasil/languages/create", "/Yggdrasil/languages/**/edit", "/Yggdrasil/languages/**/delete").hasRole("ADMIN")
+                                .requestMatchers("/Yggdrasil/countries/**").authenticated()
+                                .requestMatchers("/Yggdrasil/cities/**").authenticated()
+                                .requestMatchers("/Yggdrasil/languages/**").authenticated()
+                                .requestMatchers("/Yggdrasil").authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
                 .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .build();
