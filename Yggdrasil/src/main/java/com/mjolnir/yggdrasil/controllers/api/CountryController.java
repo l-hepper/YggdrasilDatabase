@@ -122,7 +122,7 @@ public class CountryController {
     }
 
     @PatchMapping("/{countryCode}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String updateCountry(@PathVariable String countryCode, @RequestBody Map<String, Object> updates, Model model) {
         Optional<CountryEntity> toUpdate = worldService.getCountryByCode(countryCode);
 

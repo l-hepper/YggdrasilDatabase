@@ -64,9 +64,10 @@
                 <td>
                     <div class="button-group">
                         <a href="#" class="btn btn-warning btn-sm"
-                           th:attr="data-country-code=${country.getCode()}"
+                           th:attr="data-country-code=${country.getCode()}, data-name=${country.getName()}, data-continent=${country.getContinent()}, data-region=${country.getRegion()}, data-surface-area=${country.getSurfaceArea()}, data-indep-year=${country.getIndepYear()}, data-population=${country.getPopulation()}, data-life-expectancy=${country.getLifeExpectancy()}, data-gnp=${country.getGnp()}, data-gnp-old=${country.getGNPOld()}, data-local-name=${country.getLocalName()}, data-government-form=${country.getGovernmentForm()}, data-head-of-state=${country.getHeadOfState()}, data-code2=${country.getCode2()}"
                            onclick="openUpdateModal(this); return false;">
-                            Update</a>
+                            Update
+                        </a>
                         <a href="#" class="btn btn-danger btn-sm"
                            th:attr="data-country-code=${country.getCode()}"
                            onclick="deleteCountry(this)">Delete</a>
@@ -128,7 +129,6 @@
 
 
     function openUpdateModal(element) {
-        console.log("Made it to here");
         if (element) {
             // Extract data attributes from the clicked element
             var countryCode = element.getAttribute('data-country-code');
