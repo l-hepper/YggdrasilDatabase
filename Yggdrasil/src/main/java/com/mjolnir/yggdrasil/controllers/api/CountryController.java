@@ -47,6 +47,8 @@ public class CountryController {
     public String searchCountries(@RequestParam(required = false, defaultValue = "") String searchMethod,
                                   @RequestParam(name = "countryCode", required = false) String countryCode,
                                   @RequestParam(required = false, defaultValue = "") String name,
+                                  @RequestParam(required = false, defaultValue = "") String continent,
+                                  @RequestParam(required = false, defaultValue = "") String region,
                                   Model model) {
 
         switch (searchMethod) {
@@ -64,9 +66,21 @@ public class CountryController {
                     model.addAttribute("country", country);
                 }
                 break;
+            case "continent":
+                if (continent != null && !continent.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByContinent(continent);
+                    model.addAttribute("country", countries);
+                }
+                break;
+            case "region":
+                if (region != null && !region.isEmpty()) {
+                    List<CountryEntity> countries = countryRepository.findCountryEntitiesByRegion(region);
+                    model.addAttribute("country", countries);
+                }
+                break;
         }
 
-        return "countries/searchResults"; // The name of the HTML template to display results
+        return "countries/searchResults";
     }
 
     // Method to render the update form with the country data

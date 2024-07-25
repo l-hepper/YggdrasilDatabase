@@ -15,12 +15,8 @@
                             <option value="" disabled selected>Select a method</option>
                             <option value="id">Search by Code</option>
                             <option value="name">Search by Name</option>
-<!--                            <option value="countryCode">Search by Country Code</option>-->
-<!--                            <option value="largestDistricts">Largest Districts</option>-->
-<!--                            <option value="smallestDistricts">Smallest Districts</option>-->
-<!--                            <option value="byDistrict">By District</option>-->
-<!--                            <option value="populationBelow">Population Below</option>-->
-<!--                            <option value="populationAbove">Population Above</option>-->
+                            <option value="continent">Search by Continent</option>
+                            <option value="region">Search by Region</option>
                         </select>
                     </div>
 
@@ -35,6 +31,20 @@
                         <div class="mb-3">
                             <label for="name" class="form-label">Country Name</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Enter Country Name">
+                        </div>
+                    </div>
+
+                    <div id="searchByContinentFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="continent" class="form-label">Continent Name</label>
+                            <input type="text" id="continent" name="continent" class="form-control" placeholder="Enter Continent Name">
+                        </div>
+                    </div>
+
+                    <div id="searchByRegionFields" class="d-none">
+                        <div class="mb-3">
+                            <label for="region" class="form-label">Region Name</label>
+                            <input type="text" id="region" name="region" class="form-control" placeholder="Enter Region Name">
                         </div>
                     </div>
 
