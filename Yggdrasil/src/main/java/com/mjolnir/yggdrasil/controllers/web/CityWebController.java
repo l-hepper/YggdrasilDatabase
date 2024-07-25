@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class CityWebController {
@@ -123,24 +124,22 @@ public class CityWebController {
 
 
 
-
-
-
-
     @PostMapping("/cities/create")
     public String createCity(@ModelAttribute CityDTO cityDTO, Model model) {
         try {
-            worldService.createNewCity(
+            int cityId = worldService.createNewCity(
                     cityDTO.getCountryCode(),
                     cityDTO.getName(),
                     cityDTO.getDistrict(),
                     cityDTO.getPopulation(),
                     cityDTO.isCapital()
             );
-            return "redirect:/cities";
+            CityEntity cities = worldService.getCityById(cityId);
+            model.addAttribute("cities", cities);
+            return "redirect:/cities/search?searchMethod=id&cityId=" + cityId + "&name=&countryCode=&largestDistricts=&smallestDistricts=&district=&populationBelow=&populationAbove=";
         } catch (Exception e) {
             model.addAttribute("error", "An error occurred while creating the city.");
-            return "cities/create";
+            return "/cities";
         }
     }
 
