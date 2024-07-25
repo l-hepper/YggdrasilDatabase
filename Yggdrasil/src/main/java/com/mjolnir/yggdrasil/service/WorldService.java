@@ -44,7 +44,7 @@ public class WorldService {
     }
 
 
-    public void createNewCity(String countryCode, String cityName, String cityDistrict, Integer population, boolean isCapital) {
+    public int createNewCity(String countryCode, String cityName, String cityDistrict, Integer population, boolean isCapital) {
         Optional<CountryEntity> countryEntityOptional = countryRepository.findById(countryCode);
         if (countryEntityOptional.isPresent() && cityName != null && cityDistrict != null && population > 0) {
 
@@ -67,6 +67,7 @@ public class WorldService {
             } else {
                 logger.info("City " + cityName + " added successfully for country " + countryEntity.getName() + ".");
             }
+            return cityEntity.getId();
         } else {
             if (countryEntityOptional.isEmpty()) {
                 logger.warning("Country with code " + countryCode + " does not exist.");
@@ -80,6 +81,7 @@ public class WorldService {
             if (population < 0) {
                 logger.warning("Population must be greater than 0.");
             }
+            return -1;
         }
     }
 
