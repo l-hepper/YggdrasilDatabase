@@ -4,7 +4,6 @@ import com.mjolnir.yggdrasil.entities.CountryLanguageEntity;
 import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
 import com.mjolnir.yggdrasil.exceptions.InvalidBodyException;
 import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
-import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import com.mjolnir.yggdrasil.utilities.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +13,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,20 +25,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/Yggdrasil/languages")
 public class LanguageController {
-    private final MjolnirApiService mjolnirApiService;
     private final WorldService worldService;
 
-    public LanguageController(MjolnirApiService mjolnirApiService, WorldService worldService) {
-        this.mjolnirApiService = mjolnirApiService;
+    public LanguageController(WorldService worldService) {
         this.worldService = worldService;
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<CountryLanguageEntity>> createLanguage(@RequestBody CountryLanguageEntity language, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey, HttpServletRequest request) {
-        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
-        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<EntityModel<CountryLanguageEntity>> createLanguage(@RequestBody CountryLanguageEntity language, HttpServletRequest request) {
         try {
             worldService.createNewCountryLanguage(language.getId().getCountryCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
         } catch (IllegalArgumentException e) {
@@ -55,8 +50,8 @@ public class LanguageController {
         }
     }
 
-
     @GetMapping("/{countryCode}/{language}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language, HttpServletRequest request) {
         EntityModel<CountryLanguageEntity> languageEntity = worldService.getLanguageById(countryCode, language)
                 .map(lang -> {
@@ -73,6 +68,7 @@ public class LanguageController {
     }
 
     @GetMapping("/{countryCode}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getLanguageById(@PathVariable String countryCode, HttpServletRequest request) {
         List<CountryLanguageEntity> languages = worldService.getLanguagesByCountryCode(countryCode);
         List<EntityModel<CountryLanguageEntity>> resources = languages.stream()
@@ -93,6 +89,7 @@ public class LanguageController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<CollectionModel<EntityModel<CountryLanguageEntity>>> getAllLanguages(HttpServletRequest request) {
         List<CountryLanguageEntity> languages = worldService.getAllLanguages();
         List<EntityModel<CountryLanguageEntity>> resources = languages.stream()
@@ -113,18 +110,14 @@ public class LanguageController {
     }
 
     @PutMapping("/{countryCode}/{language}")
-    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
-        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
-        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<EntityModel<CountryLanguageEntity>> updateLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestBody CountryLanguageEntity updatedLanguage) {
         CountryLanguageIdEntity primaryKey = new CountryLanguageIdEntity();
         primaryKey.setCountryCode(countryCode);
         primaryKey.setLanguage(language);
         boolean wasUpdateSuccessful = worldService.updateLanguageById(primaryKey, updatedLanguage);
 
         if (wasUpdateSuccessful) {
-
             Optional<CountryLanguageEntity> lang = worldService.getLanguageById(countryCode, language);
 
             if (lang.isEmpty())
@@ -137,11 +130,8 @@ public class LanguageController {
     }
 
     @DeleteMapping("/{countryCode}/{language}")
-    public ResponseEntity<Void> deleteLanguage(@PathVariable String countryCode, @PathVariable String language, @RequestHeader(name = "MJOLNIR-API-KEY") String apiKey) {
-        String requestRole = mjolnirApiService.getRoleFromApiKey(apiKey);
-        if (requestRole == null || !requestRole.equals("FULL_ACCESS"))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized user.");
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteLanguage(@PathVariable String countryCode, @PathVariable String language) {
         boolean wasDeleteSuccessful = worldService.deleteLanguageByCountryCodeAndLanguage(countryCode, language);
 
         if (wasDeleteSuccessful) {
