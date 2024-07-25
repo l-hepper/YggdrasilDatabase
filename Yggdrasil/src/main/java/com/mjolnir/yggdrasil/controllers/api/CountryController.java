@@ -108,7 +108,7 @@ public class CountryController {
         return "countries";
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteCountry(@PathVariable String id) {
         boolean deleted = worldService.deleteCountryByCode(id);
         if (!deleted) {
