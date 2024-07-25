@@ -31,16 +31,28 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
+                        //All
                         authRequest.requestMatchers("/", "/welcome").permitAll()
                                 .requestMatchers("/css/**", "/images/**").permitAll()
+                                //Countries
                                 .requestMatchers("/Yggdrasil/countries/edit/*", "/Yggdrasil/countries/update", "/Yggdrasil/countries/delete/**").hasRole("ADMIN")
-                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
-                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
-                                .requestMatchers("/").authenticated()
                                 .requestMatchers("/Yggdrasil/countries", "/Yggdrasil/countries/search").authenticated()
+
+                                //Cities
                                 .requestMatchers("/cities/**").authenticated()
+                                .requestMatchers("/cities/id/**").authenticated()
+                                .requestMatchers("/Yggdrasil/cities/**", "/Yggdrasil/cities/**", "/Yggdrasil/cities/**").hasRole("ADMIN")
+                                .requestMatchers("/cities/**").hasRole("ADMIN")
+
+                                //Languages
                                 .requestMatchers("/languages/**").authenticated()
+                                .requestMatchers("/Yggdrasil/languages/**").hasRole("ADMIN")
+
+
+                                .requestMatchers("/").authenticated()
                                 .requestMatchers("/Yggdrasil").authenticated())
+
+
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .defaultSuccessUrl("/Yggdrasil", true)
