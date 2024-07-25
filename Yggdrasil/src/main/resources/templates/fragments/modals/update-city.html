@@ -1,0 +1,68 @@
+<div class="modal fade" id="updateCityModal" tabindex="-1" role="dialog" aria-labelledby="updateCityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateCityModalLabel">Update City Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="updateCityForm" method="post" action="/cities/update/${cityId}">
+                <input type="hidden" name="_method" value="patch">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="cityIdUpdate">City ID</label>
+                        <input type="text" class="form-control" id="cityIdUpdate" name="cityId" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="cityNameUpdate">City Name</label>
+                        <input type="text" class="form-control" id="cityNameUpdate" name="cityName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="countryCodeUpdate">Country Code</label>
+                        <input type="text" class="form-control" id="countryCodeUpdate" name="countryCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="districtUpdate">District</label>
+                        <input type="text" class="form-control" id="districtUpdate" name="district" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="populationUpdate">Population</label>
+                        <input type="number" class="form-control" id="populationUpdate" name="population" min="0" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="updateSuccessModal" tabindex="-1" role="dialog" aria-labelledby="updateSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSuccessModalLabel">City Updated Successfully</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="updateSuccessModalBody">
+                <p>The city has been updated successfully!</p>
+                <p><strong>City Name:</strong> <span id="updatedCityName"></span></p>
+                <p><strong>City ID:</strong> <span id="updatedCityId"></span></p>
+                <p><strong>Country Code:</strong> <span id="updatedCountryCode"></span></p>
+                <p><strong>District:</strong> <span id="updatedDistrict"></span></p>
+                <p><strong>Population:</strong> <span id="updatedPopulation"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="viewCityButton" class="btn btn-primary">View City</button>
+                <button type="button" id="viewAllCitiesButton" class="btn btn-secondary">View All Cities</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

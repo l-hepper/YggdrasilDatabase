@@ -6,6 +6,7 @@ import com.mjolnir.yggdrasil.repositories.CountryRepository;
 import com.mjolnir.yggdrasil.service.MjolnirApiService;
 import com.mjolnir.yggdrasil.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -85,7 +87,6 @@ public class CountryController {
         return "countries/searchResults";
     }
 
-    // Method to render the update form with the country data
     @GetMapping("/edit/{code}")
     public String editCountry(@PathVariable String code, Model model) {
         Optional<CountryEntity> country = worldService.getCountryByCode(code);
@@ -97,18 +98,8 @@ public class CountryController {
         return "countries";
     }
 
-    @PostMapping("/update")
-    public String updateCountry(@ModelAttribute CountryEntity updatedCountry, Model model) {
-
-        worldService.updateCountryById(updatedCountry.getCode(), updatedCountry);
-
-        List<CountryEntity> countriesList = worldService.getAllCountries();
-        model.addAttribute("countriesList", countriesList);
-
-        return "countries";
-    }
-
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String deleteCountry(@PathVariable String id) {
         boolean deleted = worldService.deleteCountryByCode(id);
         if (!deleted) {
@@ -118,7 +109,111 @@ public class CountryController {
         return "countries";
     }
 
-//
+    @PostMapping("/update/{countryCode}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String updateCountry(@PathVariable String countryCode, @RequestBody Map<String, Object> updates, Model model) {
+        Optional<CountryEntity> toUpdate = worldService.getCountryByCode(countryCode);
+
+        if (toUpdate.isPresent()) {
+            CountryEntity country = toUpdate.get();
+
+            if (updates.containsKey("name")) {
+                country.setName((String) updates.get("name"));
+            }
+            if (updates.containsKey("continent")) {
+                country.setContinent((String) updates.get("continent"));
+            }
+            if (updates.containsKey("region")) {
+                country.setRegion((String) updates.get("region"));
+            }
+            if (updates.containsKey("surfaceArea")) {
+                Object surfaceAreaValue = updates.get("surfaceArea");
+                if (surfaceAreaValue instanceof Number) {
+                    country.setSurfaceArea(BigDecimal.valueOf(((Number) surfaceAreaValue).doubleValue()));
+                } else {
+                    throw new IllegalArgumentException("Invalid value for surfaceArea: " + surfaceAreaValue);
+                }
+            }
+            if (updates.containsKey("indepYear")) {
+                Object indepYearValue = updates.get("indepYear");
+                if (indepYearValue instanceof Number) {
+                    country.setIndepYear(((Number) indepYearValue).shortValue());
+                } else {
+                    throw new IllegalArgumentException("Invalid value for indepYear: " + indepYearValue);
+                }
+            }
+            if (updates.containsKey("population")) {
+                Object populationValue = updates.get("population");
+                if (populationValue instanceof Number) {
+                    country.setPopulation(((Number) populationValue).intValue());
+                } else {
+                    throw new IllegalArgumentException("Invalid value for population: " + populationValue);
+                }
+            }
+            if (updates.containsKey("lifeExpectancy")) {
+                Object lifeExpectancyValue = updates.get("lifeExpectancy");
+                if (lifeExpectancyValue instanceof Number) {
+                    country.setLifeExpectancy(BigDecimal.valueOf(((Number) lifeExpectancyValue).doubleValue()));
+                } else {
+                    throw new IllegalArgumentException("Invalid value for lifeExpectancy: " + lifeExpectancyValue);
+                }
+            }
+            if (updates.containsKey("gnp")) {
+                Object gnpValue = updates.get("gnp");
+                if (gnpValue instanceof Number) {
+                    country.setGnp(BigDecimal.valueOf(((Number) gnpValue).doubleValue()));
+                } else {
+                    throw new IllegalArgumentException("Invalid value for gnp: " + gnpValue);
+                }
+            }
+            if (updates.containsKey("gNPOld")) {
+                Object gnpOldValue = updates.get("gNPOld");
+                if (gnpOldValue instanceof Number) {
+                    country.setGNPOld(BigDecimal.valueOf(((Number) gnpOldValue).doubleValue()));
+                } else {
+                    throw new IllegalArgumentException("Invalid value for gNPOld: " + gnpOldValue);
+                }
+            }
+            if (updates.containsKey("localName")) {
+                country.setLocalName((String) updates.get("localName"));
+            }
+            if (updates.containsKey("governmentForm")) {
+                country.setGovernmentForm((String) updates.get("governmentForm"));
+            }
+            if (updates.containsKey("headOfState")) {
+                country.setHeadOfState((String) updates.get("headOfState"));
+            }
+            if (updates.containsKey("capital")) {
+                Object capitalValue = updates.get("capital");
+                if (capitalValue instanceof Number) {
+                    country.setCapital(((Number) capitalValue).intValue());
+                } else {
+                    throw new IllegalArgumentException("Invalid value for capital: " + capitalValue);
+                }
+            }
+            if (updates.containsKey("code2")) {
+                country.setCode2((String) updates.get("code2"));
+            }
+
+
+                // Save the updated country
+                boolean isUpdated = worldService.updateCountryById(countryCode, country);
+                if (isUpdated) {
+                    // Redirect or return appropriate response
+                    List<CountryEntity> countriesList = worldService.getAllCountries();
+                    model.addAttribute("countriesList", countriesList);
+                    return "countries"; // Redirect or return view
+                } else {
+//                    throw new UpdateFailedException("An error occurred while updating country: " + countryCode);
+                    return "";
+                }
+            } else {
+//                throw new UpdateFailedException("Country not found: " + countryCode);
+                return "";
+            }
+        }
+
+
     @PostMapping("/create")
     public String createCountry(@ModelAttribute CountryEntity country, Model model) {
 
