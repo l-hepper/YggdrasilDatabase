@@ -63,7 +63,7 @@
 
                 <td>
                     <div class="button-group">
-                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/Yggdrasil/countries/update/' + ${country.code}}">Update</a>
+                        <a href="#" class="btn btn-warning" data-toggle="modal" data-target="#updateCountryModal">Update</a>
                         <a href="#" class="btn btn-danger btn-sm" th:href="@{'/Yggdrasil/countries/delete/' + ${country.code}}">Delete</a>
                     </div>
                 </td>
