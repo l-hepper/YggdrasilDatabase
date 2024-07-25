@@ -32,7 +32,6 @@ public class LanguageController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<EntityModel<CountryLanguageEntity>> createLanguage(@RequestBody CountryLanguageEntity language, HttpServletRequest request) {
         try {
             worldService.createNewCountryLanguage(language.getId().getCountryCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
@@ -51,7 +50,6 @@ public class LanguageController {
     }
 
     @GetMapping("/{countryCode}/{language}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<EntityModel<CountryLanguageEntity>> getLanguageById(@PathVariable String countryCode, @PathVariable String language, HttpServletRequest request) {
         EntityModel<CountryLanguageEntity> languageEntity = worldService.getLanguageById(countryCode, language)
                 .map(lang -> {
