@@ -21,14 +21,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Controller
 @RequestMapping("/countries")
-public class CountryController {
+public class CountryWebController {
 
     private final MjolnirApiService mjolnirApiService;
     private final WorldService worldService;
     private final CountryRepository countryRepository;
 
     @Autowired
-    public CountryController(MjolnirApiService mjolnirApiService, WorldService worldService, CountryRepository countryRepository) {
+    public CountryWebController(MjolnirApiService mjolnirApiService, WorldService worldService, CountryRepository countryRepository) {
         this.mjolnirApiService = mjolnirApiService;
         this.worldService = worldService;
         this.countryRepository = countryRepository;
