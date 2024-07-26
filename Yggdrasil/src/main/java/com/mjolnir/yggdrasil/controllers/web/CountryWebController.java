@@ -108,7 +108,6 @@ public class CountryWebController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String updateCountry(@PathVariable String countryCode, @RequestBody Map<String, Object> updates, Model model) {
         Optional<CountryEntity> toUpdate = worldService.getCountryByCode(countryCode);
-        System.out.println(updates.get("gnpOld"));
         if (toUpdate.isPresent()) {
             CountryEntity country = toUpdate.get();
 
