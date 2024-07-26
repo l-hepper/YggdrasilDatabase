@@ -19,5 +19,4 @@ public class WebController {
     public String showLoginPage() {
         return "login";
     }
-
 }
