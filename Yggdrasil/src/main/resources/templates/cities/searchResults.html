@@ -39,8 +39,8 @@
                 <td th:text="${city.getCountryCode().getName()} + ' ' + '(' + ${city.getCountryCode().getCode()} + ')'"></td>
                 <td th:text="${city.district}"></td>
                 <td th:text="${city.population}"></td>
-                <td>
-                    <div sec:authorize="hasRole('ROLE_ADMIN')" class="button-group">
+                <td sec:authorize="hasRole('ROLE_ADMIN')">
+                    <div class="button-group">
                         <button class="btn btn-warning btn-sm"
                                 data-toggle="modal"
                                 data-target="#updateCityModal"
