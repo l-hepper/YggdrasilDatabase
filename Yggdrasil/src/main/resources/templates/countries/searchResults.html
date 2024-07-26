@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Countries - Yggdrasil World Database</title>
@@ -14,10 +14,10 @@
     <h1>Countries Management</h1>
     <div class="mb-4">
         <div class="btn-group" role="group" aria-label="CRUD actions">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#createCountryModal">Create</button>
-            <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#searchCountryModal">Read</a>
-            <a href="#" class="btn btn-warning">Update</a>
-            <a href="#" class="btn btn-danger">Delete</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#createCountryModal">Create</button>
+            </div>
+            <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#searchCountryModal">Search</a>
         </div>
     </div>
     <div class="scrollable-table">
@@ -39,7 +39,7 @@
                 <th>Head of State</th>
                 <th>Capital</th>
                 <th>Code 2</th>
-                <th>Actions</th>
+                <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -59,10 +59,16 @@
                 <td th:text="${country.headOfState}"></td>
                 <td th:text="${country.capital}"></td>
                 <td th:text="${country.code2}"></td>
-                <td>
+                <td sec:authorize="hasRole('ROLE_ADMIN')">
                     <div class="button-group">
-                        <a href="#" class="btn btn-warning btn-sm" th:href="@{'/countries/update/' + ${country.code}}">Update</a>
-                        <a href="#" class="btn btn-danger btn-sm" th:href="@{'/countries/delete/' + ${country.code}}">Delete</a>
+                        <a href="#" class="btn btn-warning btn-sm"
+                           th:attr="data-country-code=${country.getCode()}, data-name=${country.getName()}, data-continent=${country.getContinent()}, data-region=${country.getRegion()}, data-surface-area=${country.getSurfaceArea()}, data-indep-year=${country.getIndepYear()}, data-population=${country.getPopulation()}, data-life-expectancy=${country.getLifeExpectancy()}, data-gnp=${country.getGnp()}, data-gnp-old=${country.getGNPOld()}, data-local-name=${country.getLocalName()}, data-government-form=${country.getGovernmentForm()}, data-head-of-state=${country.getHeadOfState()}, data-code2=${country.getCode2()}"
+                           onclick="openUpdateModal(this); return false;">
+                            Update
+                        </a>
+                        <a href="#" class="btn btn-danger btn-sm"
+                           th:attr="data-country-code=${country.getCode()}"
+                           onclick="deleteCountry(this)">Delete</a>
                     </div>
                 </td>
             </tr>
@@ -72,8 +78,8 @@
 </div>
 
 <div th:replace="~{fragments/modals/create-country}"></div>
-
 <div th:replace="~{fragments/modals/search-country}"></div>
+<div th:replace="~{fragments/modals/update-country}"></div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
@@ -85,6 +91,144 @@
         document.getElementById('searchByContinentFields').classList.toggle('d-none', value !== 'continent');
         document.getElementById('searchByRegionFields').classList.toggle('d-none', value !== 'region');
         document.getElementById('searchByGovernmentFormFields').classList.toggle('d-none', value !== 'governmentForm');
+    }
+</script>
+<script>
+    function deleteCountry(element) {
+        var countryCode = element.getAttribute('data-country-code');
+
+        if (confirm('Are you sure you want to delete this country?')) {
+            fetch(`/countries/delete/${encodeURIComponent(countryCode)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    alert('Country deleted successfully.');
+                    location.reload();
+                } else {
+                    alert('Failed to delete country.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete country.');
+            });
+        }
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('updateCountryModal').addEventListener('submit', function (event) {
+            event.preventDefault();
+            patchCountry();
+        });
+    });
+
+
+    function openUpdateModal(element) {
+        if (element) {
+            // Extract data attributes from the clicked element
+            var countryCode = element.getAttribute('data-country-code');
+            var name = element.getAttribute('data-name');
+            var continent = element.getAttribute('data-continent');
+            var region = element.getAttribute('data-region');
+            var surfaceArea = element.getAttribute('data-surface-area');
+            var indepYear = element.getAttribute('data-indep-year');
+            var population = element.getAttribute('data-population');
+            var lifeExpectancy = element.getAttribute('data-life-expectancy');
+            var gnp = element.getAttribute('data-gnp');
+            var gnpOld = element.getAttribute('data-gnp-old');
+            var localName = element.getAttribute('data-local-name');
+            var governmentForm = element.getAttribute('data-government-form');
+            var headOfState = element.getAttribute('data-head-of-state');
+            var code2 = element.getAttribute('data-code2');
+
+            // Set the form values in the update modal
+            document.querySelector('#updateCountryModal #code').value = countryCode;
+            document.querySelector('#updateCountryModal #name').value = name;
+            document.querySelector('#updateCountryModal #continent').value = continent;
+            document.querySelector('#updateCountryModal #region').value = region;
+            document.querySelector('#updateCountryModal #surfaceArea').value = surfaceArea;
+            document.querySelector('#updateCountryModal #indepYear').value = indepYear;
+            document.querySelector('#updateCountryModal #population').value = population;
+            document.querySelector('#updateCountryModal #lifeExpectancy').value = lifeExpectancy;
+            document.querySelector('#updateCountryModal #gnp').value = gnp;
+            document.querySelector('#updateCountryModal #gnpOld').value = gnpOld;
+            document.querySelector('#updateCountryModal #localName').value = localName;
+            document.querySelector('#updateCountryModal #governmentForm').value = governmentForm;
+            document.querySelector('#updateCountryModal #headOfState').value = headOfState;
+            document.querySelector('#updateCountryModal #code2').value = code2;
+        }
+
+        // Show the modal
+        $('#updateCountryModal').modal('show');
+    }
+
+    function patchCountry() {
+        // Extract values from the form fields in the update modal
+        var countryCode = document.querySelector('#updateCountryModal #code').value;
+        var name = document.querySelector('#updateCountryModal #name').value;
+        var continent = document.querySelector('#updateCountryModal #continent').value;
+        var region = document.querySelector('#updateCountryModal #region').value;
+        var surfaceArea = document.querySelector('#updateCountryModal #surfaceArea').value;
+        var indepYear = document.querySelector('#updateCountryModal #indepYear').value;
+        var population = document.querySelector('#updateCountryModal #population').value;
+        var lifeExpectancy = document.querySelector('#updateCountryModal #lifeExpectancy').value;
+        var gnp = document.querySelector('#updateCountryModal #gnp').value;
+        var gnpOld = document.querySelector('#updateCountryModal #gnpOld').value;
+        var localName = document.querySelector('#updateCountryModal #localName').value;
+        var governmentForm = document.querySelector('#updateCountryModal #governmentForm').value;
+        var headOfState = document.querySelector('#updateCountryModal #headOfState').value;
+        var code2 = document.querySelector('#updateCountryModal #code2').value;
+
+        // Validate and prepare the data
+        var updateData = {
+            name: name,
+            continent: continent,
+            region: region,
+            surfaceArea: parseFloat(surfaceArea),
+            indepYear: parseInt(indepYear),
+            population: parseInt(population),
+            lifeExpectancy: parseFloat(lifeExpectancy),
+            gnp: parseFloat(gnp),
+            gnpOld: parseFloat(gnpOld),
+            localName: localName,
+            governmentForm: governmentForm,
+            headOfState: headOfState,
+            code2: code2
+        };
+
+        // Validate numeric fields
+        if (isNaN(updateData.surfaceArea) || updateData.surfaceArea < 0 ||
+            isNaN(updateData.indepYear) || updateData.indepYear < 0 ||
+            isNaN(updateData.population) || updateData.population < 0 ||
+            isNaN(updateData.lifeExpectancy) || updateData.lifeExpectancy < 0 ||
+            isNaN(updateData.gnp) || updateData.gnp < 0 ||
+            isNaN(updateData.gnpOld) || updateData.gnpOld < 0) {
+            alert('Please provide valid numeric values.');
+            return;
+        }
+
+        // Make the PATCH request
+        fetch(`/countries/update/${encodeURIComponent(countryCode)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Country updated successfully.');
+                    location.reload();
+                } else {
+                    alert('Failed to update country.');
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
     }
 </script>
 </body>
