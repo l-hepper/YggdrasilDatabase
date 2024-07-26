@@ -111,7 +111,7 @@ public class LanguageWebController {
                 toUpdate.get().setIsOfficial((String) updates.get("isOfficial"));
             }
             if (updates.containsKey("percentage")) {
-                toUpdate.get().setPercentage(BigDecimal.valueOf((double) updates.get("percentage")));
+                toUpdate.get().setPercentage(BigDecimal.valueOf(((Number)updates.get("percentage")).doubleValue()));
             }
 
             boolean isUpdated = worldService.updateLanguageById(toUpdate.get().getId(), toUpdate.get());
