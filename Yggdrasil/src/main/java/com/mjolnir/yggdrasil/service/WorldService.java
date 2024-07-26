@@ -9,14 +9,11 @@ import com.mjolnir.yggdrasil.repositories.CityRepository;
 import com.mjolnir.yggdrasil.repositories.CountryLanguageRepository;
 import com.mjolnir.yggdrasil.repositories.CountryRepository;
 
-import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,14 +30,12 @@ public class WorldService {
     private final CityRepository cityRepository;
     private final CountryLanguageRepository countryLanguageRepository;
     private final CountryRepository countryRepository;
-    private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     @Autowired
-    public WorldService(CityRepository cityRepository, CountryLanguageRepository countryLanguageRepository, CountryRepository countryRepository, DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration) {
+    public WorldService(CityRepository cityRepository, CountryLanguageRepository countryLanguageRepository, CountryRepository countryRepository) {
         this.cityRepository = cityRepository;
         this.countryLanguageRepository = countryLanguageRepository;
         this.countryRepository = countryRepository;
-        this.dataSourceTransactionManagerAutoConfiguration = dataSourceTransactionManagerAutoConfiguration;
     }
 
 
@@ -627,5 +622,30 @@ public class WorldService {
     public boolean isValidCountryCode(String countryCode) {
         Optional<CountryEntity> country = countryRepository.findById(countryCode);
         return country.isPresent();
+    }
+
+    // new search methods
+    public List<CountryLanguageEntity> getLanguagesByLanguage(String language) {
+        return countryLanguageRepository.findAll().stream()
+                .filter(lang -> lang.getLanguage().equals(language))
+                .toList();
+    }
+
+    public List<CountryLanguageEntity> getLanguagesByIsOfficial(Boolean isOfficial) {
+        return countryLanguageRepository.findAll().stream()
+                .filter(lang -> lang.getIsOfficial().equals("T") == isOfficial)
+                .toList();
+    }
+
+    public List<CountryLanguageEntity> getLanguagesByPercentageBelow(BigDecimal percentageBelow) {
+        return countryLanguageRepository.findAll().stream()
+                .filter(lang -> lang.getPercentage().compareTo(percentageBelow) <= 0)
+                .toList();
+    }
+
+    public List<CountryLanguageEntity> getLanguagesByPercentageAbove(BigDecimal percentageAbove) {
+        return countryLanguageRepository.findAll().stream()
+                .filter(lang -> lang.getPercentage().compareTo(percentageAbove) >= 0)
+                .toList();
     }
 }

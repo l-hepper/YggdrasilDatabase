@@ -17,19 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
 @Controller
 @RequestMapping("/countries")
 public class CountryWebController {
-
-    private final MjolnirApiService mjolnirApiService;
     private final WorldService worldService;
     private final CountryRepository countryRepository;
 
     @Autowired
-    public CountryWebController(MjolnirApiService mjolnirApiService, WorldService worldService, CountryRepository countryRepository) {
-        this.mjolnirApiService = mjolnirApiService;
+    public CountryWebController(WorldService worldService, CountryRepository countryRepository) {
         this.worldService = worldService;
         this.countryRepository = countryRepository;
     }
@@ -213,6 +208,7 @@ public class CountryWebController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createCountry(@ModelAttribute CountryEntity country, Model model) {
 
         CountryEntity countryEntity = null;

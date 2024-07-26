@@ -23,7 +23,7 @@ import java.util.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/Yggdrasil/languages")
+@RequestMapping("/Yggdrasil/api/languages")
 public class LanguageController {
     private final MjolnirApiService mjolnirApiService;
     private final WorldService worldService;

@@ -14,10 +14,8 @@
     <h1>Languages Management</h1>
     <div class="mb-4">
         <div class="btn-group" role="group" aria-label="CRUD actions">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#createLanguageModal">Create</button>
+            <button sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-primary" data-toggle="modal" data-target="#createLanguageModal">Create</button>
             <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#searchLanguageModal">Read</a>
-            <a href="#" class="btn btn-warning">Update</a>
-            <a href="#" class="btn btn-danger">Delete</a>
         </div>
     </div>
     <div class="scrollable-table">
@@ -57,7 +55,7 @@
 </div>
 
 <div th:replace="~{fragments/modals/create-language.html}"></div>
-<!--<div th:replace="~{fragments/modals/search-language.html}"></div>-->
+<div th:replace="~{fragments/modals/search-language.html}"></div>
 <div th:replace="~{fragments/modals/no-language.html}"></div>
 <div th:replace="~{fragments/modals/update-language.html}"></div>
 
