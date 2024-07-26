@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/cities/search}" method="get">
+                <form th:action="@{/cities/search}" method="get" autocomplete="off">
                     <div class="mb-3">
                         <label for="searchMethod" class="form-label">Select Search Method</label>
                         <select id="searchMethod" name="searchMethod" class="form-select" onchange="toggleFields(this.value)">
