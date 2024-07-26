@@ -1,7 +1,6 @@
 package com.mjolnir.yggdrasil.controllers.web;
 
-import com.mjolnir.yggdrasil.dto.CityDTO;
-import com.mjolnir.yggdrasil.entities.CountryLanguageIdEntity;
+import com.mjolnir.yggdrasil.exceptions.ResourceNotFoundException;
 import com.mjolnir.yggdrasil.exceptions.UpdateFailedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
@@ -30,7 +29,7 @@ public class LanguageWebController {
     public String createCity(@ModelAttribute CountryLanguageEntity language, Model model) {
         try {
             worldService.createNewCountryLanguage(language.getId().getCountryCode(), language.getLanguage(), language.getIsOfficial(), language.getPercentage());
-            return "redirect:/languages/" + language.getId().getCountryCode();
+            return "redirect:search?searchMethod=countryCode&countryCode=" + language.getId().getCountryCode() + "&language=&percentageBelow=&percentageAbove=";
         } catch (Exception e) {
             model.addAttribute("error", "An error occurred while creating the city.");
             return "languages/create";
@@ -45,25 +44,61 @@ public class LanguageWebController {
         return "languages";
     }
 
-    @GetMapping("/{countryCode}")
+    @GetMapping("/search")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public String getAllLanguages(@PathVariable String countryCode, Model model) {
-        List<CountryLanguageEntity> languages = worldService.getLanguagesByCountryCode(countryCode);
-        model.addAttribute("languages", languages);
-        return "languages";
-    }
+    public String searchLanguages(
+            @RequestParam(required = false) String searchMethod,
+            @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Boolean isOfficial,
+            @RequestParam(required = false) BigDecimal percentageBelow,
+            @RequestParam(required = false) BigDecimal percentageAbove,
+            Model model) {
 
-    @GetMapping("/{countryCode}/{language}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public String getAllLanguages(@PathVariable String countryCode, @PathVariable String language, Model model) {
-        Optional<CountryLanguageEntity> languageEntity = worldService.getLanguageById(countryCode, language);
-        if (languageEntity.isPresent()) {
-            List<CountryLanguageEntity> languages = new ArrayList<>();
-            languages.add(languageEntity.get());
-            model.addAttribute("languages", languages);
-        } else {
-            model.addAttribute("noLanguageFound", true);
+        List<CountryLanguageEntity> languages = new ArrayList<>();
+        try {
+            switch (searchMethod) {
+                case "countryCode":
+                    if (countryCode != null) {
+                        languages = worldService.getLanguagesByCountryCode(countryCode);
+                    } else {
+                        throw new IllegalArgumentException("countryCode is required for search by countryCode");
+                    }
+                    break;
+                case "language":
+                    if (language != null) {
+                        languages = worldService.getLanguagesByLanguage(language);
+                    } else {
+                        throw new IllegalArgumentException("languages is required for search by languages");
+                    }
+                    break;
+                case "isOfficial":
+                    if (isOfficial != null) {
+                        languages = worldService.getLanguagesByIsOfficial(isOfficial);
+                    } else {
+                        throw new IllegalArgumentException("isOfficial is required for search by isOfficial");
+                    }
+                    break;
+                case "percentageBelow":
+                    if (percentageBelow != null) {
+                        languages = worldService.getLanguagesByPercentageBelow(percentageBelow);
+                    } else {
+                        throw new IllegalArgumentException("percentage is required for search by percentage");
+                    }
+                    break;
+                case "percentageAbove":
+                    if (percentageAbove != null) {
+                        languages = worldService.getLanguagesByPercentageAbove(percentageAbove);
+                    } else {
+                        throw new IllegalArgumentException("percentage is required for search by percentage");
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            throw new ResourceNotFoundException(e.getMessage());
         }
+
+        model.addAttribute("languages", languages);
         return "languages";
     }
 
@@ -97,7 +132,7 @@ public class LanguageWebController {
         if (isDeleted) {
             return "languages";
         } else {
-            return "redirect:/languages/" + countryCode + "/" + language;
+            throw new UpdateFailedException("An error occurred while deleting language: " + countryCode + " " + language);
         }
     }
 }

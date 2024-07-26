@@ -5,7 +5,6 @@ import com.mjolnir.yggdrasil.entities.SecurityUser;
 import com.mjolnir.yggdrasil.entities.User;
 import com.mjolnir.yggdrasil.repositories.MjolnirKeyRepository;
 import com.mjolnir.yggdrasil.repositories.UserRepository;
-import com.mjolnir.yggdrasil.utilities.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

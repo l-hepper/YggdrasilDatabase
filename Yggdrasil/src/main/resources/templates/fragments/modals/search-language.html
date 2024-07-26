@@ -1,0 +1,94 @@
+<div class="modal fade" id="searchLanguageModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="searchModalLabel">Search Languages</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form th:action="@{/languages/search}" method="get">
+          <div class="mb-3">
+            <label for="searchMethod" class="form-label">Select Search Method</label>
+            <select id="searchMethod" name="searchMethod" class="form-select" onchange="toggleFields(this.value)">
+              <option value="" disabled selected>Select a method</option>
+              <option value="countryCode">Search by Country Code</option>
+              <option value="language">Search by Language</option>
+              <option value="isOfficial">Search by Official Status</option>
+              <option value="percentageBelow">Percentage Below</option>
+              <option value="percentageAbove">Percentage Above</option>
+            </select>
+          </div>
+
+          <div id="searchByCountryCodeFields" class="d-none">
+            <div class="mb-3">
+              <label for="countryCode" class="form-label">Country Code</label>
+              <input type="text" id="countryCode" name="countryCode" class="form-control">
+            </div>
+          </div>
+
+          <div id="searchByLanguageFields" class="d-none">
+            <div class="mb-3">
+              <label for="language" class="form-label">Language</label>
+              <input type="text" id="language" name="language" class="form-control">
+            </div>
+          </div>
+
+          <div id="searchByIsOfficialFields" class="d-none">
+            <div class="mb-3">
+              <label for="isOfficial" class="form-label">Is Official</label>
+              <select id="isOfficial" name="isOfficial" class="form-select">
+                <option value="" disabled selected>Select an option</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="percentageBelowFields" class="d-none">
+            <div class="mb-3">
+              <label for="percentageBelow" class="form-label">Percentage Below</label>
+              <input type="number" id="percentageBelow" name="percentageBelow" class="form-control" min="0" max="100">
+            </div>
+          </div>
+
+          <div id="percentageAboveFields" class="d-none">
+            <div class="mb-3">
+              <label for="percentageAbove" class="form-label">Percentage Above</label>
+              <input type="number" id="percentageAbove" name="percentageAbove" class="form-control" min="0" max="100">
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleFields(value) {
+    // Hide all fields first
+    document.getElementById('searchByCountryCodeFields').classList.add('d-none');
+    document.getElementById('searchByLanguageFields').classList.add('d-none');
+    document.getElementById('searchByIsOfficialFields').classList.add('d-none');
+    document.getElementById('percentageBelowFields').classList.add('d-none');
+    document.getElementById('percentageAboveFields').classList.add('d-none');
+
+    // Show relevant fields based on selected method
+    if (value === 'countryCode') {
+      document.getElementById('searchByCountryCodeFields').classList.remove('d-none');
+    } else if (value === 'language') {
+      document.getElementById('searchByLanguageFields').classList.remove('d-none');
+    } else if (value === 'isOfficial') {
+      document.getElementById('searchByIsOfficialFields').classList.remove('d-none');
+    } else if (value === 'percentageBelow') {
+      document.getElementById('percentageBelowFields').classList.remove('d-none');
+    } else if (value === 'percentageAbove') {
+      document.getElementById('percentageAboveFields').classList.remove('d-none');
+    }
+  }
+</script>

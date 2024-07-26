@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/Yggdrasil")
+@RequestMapping("/Yggdrasil/api")
 public class CityController {
     private final WorldService worldService;
     private final MjolnirApiService mjolnirApiService;

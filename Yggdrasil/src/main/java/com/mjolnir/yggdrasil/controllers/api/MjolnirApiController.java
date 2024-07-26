@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/Mjolnir/keygen")
+@RequestMapping("/Mjolnir/api/keygen")
 public class MjolnirApiController {
     private final MjolnirApiService mjolnirApiService;
 
