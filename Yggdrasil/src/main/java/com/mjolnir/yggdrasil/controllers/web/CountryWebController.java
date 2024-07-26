@@ -108,7 +108,7 @@ public class CountryWebController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String updateCountry(@PathVariable String countryCode, @RequestBody Map<String, Object> updates, Model model) {
         Optional<CountryEntity> toUpdate = worldService.getCountryByCode(countryCode);
-
+        System.out.println(updates.get("gnpOld"));
         if (toUpdate.isPresent()) {
             CountryEntity country = toUpdate.get();
 
@@ -161,8 +161,8 @@ public class CountryWebController {
                     throw new IllegalArgumentException("Invalid value for gnp: " + gnpValue);
                 }
             }
-            if (updates.containsKey("gNPOld")) {
-                Object gnpOldValue = updates.get("gNPOld");
+            if (updates.containsKey("gnpOld")) {
+                Object gnpOldValue = updates.get("gnpOld");
                 if (gnpOldValue instanceof Number) {
                     country.setGNPOld(BigDecimal.valueOf(((Number) gnpOldValue).doubleValue()));
                 } else {
