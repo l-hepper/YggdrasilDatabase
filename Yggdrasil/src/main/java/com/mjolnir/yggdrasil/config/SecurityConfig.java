@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 //Countries
                                 .requestMatchers("/Yggdrasil/api/countries/edit/*", "/Yggdrasil/api/countries/update", "/Yggdrasil/api/countries/delete/**").hasRole("ADMIN") //api
                                 .requestMatchers("/countries/edit/**", "/countries/create", "/countries/update/**", "/countries/delete/**").hasRole("ADMIN")
-                                .requestMatchers("/Yggdrasil/countries", "/Yggdrasil/countries/search").authenticated()
+                                .requestMatchers("/countries", "/countries/search").authenticated()
 
                                 //Cities
                                 .requestMatchers("/Yggdrasil/api/cities/**", "/Yggdrasil/api/cities/**", "/Yggdrasil/api/cities/**").hasRole("ADMIN") //api
