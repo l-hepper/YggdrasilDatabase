@@ -39,6 +39,9 @@ jobs:
     - name: Change Directory Again
       run: cd YggdrasilDatabase
 
+    - name: List Files Again
+      run: ls -la
+
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
