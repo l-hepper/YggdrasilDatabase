@@ -29,9 +29,6 @@ jobs:
         cache: maven
     - name: Current Working Directory For Build
       run: pwd
-
-    - name: Switch Directory
-      run: cd YggdrasilDatabase/
         
     - name: Build with Maven
       run: mvn -B package --file YggdrasilDatabase/pom.xml -Dspring.profiles.active=ci
@@ -42,4 +39,7 @@ jobs:
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn deploy -DskipTests -s settings.xml
+      run: |
+        cd YggdrasilDatabase
+        ls -la
+        mvn deploy -DskipTests -s settings.xml
