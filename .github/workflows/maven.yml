@@ -30,17 +30,8 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file YggdrasilDatabase/pom.xml -Dspring.profiles.active=ci
 
-    - name: Change Directory
-      run: cd YggdrasilDatabase
-
-    - name: List files in YggdrasilDatabase
-      run: ls -la
-
-    - name: Change Directory Again
-      run: cd YggdrasilDatabase
-
-    - name: List Files Again
-      run: ls -la
+    - name: Check Directory
+      run: ls -al
 
     - name: Publish to GitHub Packages
       env:
