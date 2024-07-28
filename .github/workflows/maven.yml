@@ -33,4 +33,4 @@ jobs:
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn deploy -DskipTests -s Yggdrasil/settings.xml
+      run: mvn deploy -DskipTests -s settings.xml
