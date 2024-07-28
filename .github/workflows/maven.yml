@@ -30,7 +30,13 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file YggdrasilDatabase/pom.xml -Dspring.profiles.active=ci
 
+    - name: Change Directory
+      run: cd YggdrasilDatabase
+
+    - name: List files in YggdrasilDatabase
+      run: ls -la
+
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn deploy -DskipTests -s YggdrasilDatabase/settings.xml
+      run: mvn deploy -DskipTests -s settings.xml
