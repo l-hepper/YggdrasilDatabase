@@ -34,7 +34,7 @@ jobs:
       run: cd YggdrasilDatabase/
         
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Dspring.profiles.active=ci
+      run: mvn -B package --file YggdrasilDatabase/pom.xml -Dspring.profiles.active=ci
 
     - name: Check Directory
       run: ls -al
