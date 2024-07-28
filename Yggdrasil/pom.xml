@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mjolnir</groupId>
-    <artifactId>Yggdrasil</artifactId>
+    <artifactId>YggdrasilDatabase</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Yggdrasil</name>
     <description>Yggdrasil</description>
